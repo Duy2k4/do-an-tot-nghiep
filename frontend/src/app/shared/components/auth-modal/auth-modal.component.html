@@ -1,0 +1,146 @@
+<!-- Lớp phủ -->
+<div class="modal-overlay" [class.open]="isOpen" (click)="close()"></div>
+
+<!-- Hộp thoại -->
+<div class="auth-modal" [class.open]="isOpen">
+  <!-- Tab -->
+  <div class="modal-tabs" [class.right]="activeTab === 'register'">
+    <button
+      [class.active]="activeTab === 'login'"
+      (click)="switchTab('login')">Đăng nhập</button>
+    <button
+      [class.active]="activeTab === 'register'"
+      (click)="switchTab('register')">Tạo tài khoản</button>
+  </div>
+
+  <!-- ==================== FORM ĐĂNG NHẬP ==================== -->
+  <div class="tab-content" [class.active]="activeTab === 'login'">
+    <div class="modal-brand">
+      <span class="material-icons">beach_access</span>
+      <span>Du Lịch Việt</span>
+    </div>
+    <h2>Chào mừng trở lại</h2>
+    <p class="modal-sub">Đăng nhập để tiếp tục khám phá</p>
+
+    <form (ngSubmit)="onLogin()">
+      <div class="form-group">
+        <div class="input-icon-wrap">
+          <span class="field-icon material-icons">email</span>
+          <input type="email" [(ngModel)]="loginEmail" name="loginEmail" placeholder="Email của bạn" [class.is-invalid]="loginFieldErrors.email">
+        </div>
+        <span class="field-error" *ngIf="loginFieldErrors.email">{{ loginFieldErrors.email }}</span>
+      </div>
+
+      <div class="form-group">
+        <div class="input-icon-wrap password-field">
+          <span class="field-icon material-icons">lock</span>
+          <input [type]="loginShowPassword ? 'text' : 'password'" [(ngModel)]="loginPassword" name="loginPassword" placeholder="Mật khẩu" [class.is-invalid]="loginFieldErrors.password">
+          <button
+            type="button"
+            class="toggle-password"
+            (click)="loginShowPassword = !loginShowPassword"
+            [attr.aria-label]="loginShowPassword ? 'Ẩn mật khẩu' : 'Hiện mật khẩu'">
+            <span class="material-icons">{{ loginShowPassword ? 'visibility_off' : 'visibility' }}</span>
+          </button>
+        </div>
+        <span class="field-error" *ngIf="loginFieldErrors.password">{{ loginFieldErrors.password }}</span>
+      </div>
+
+      <div class="forgot-password">
+        <a routerLink="/auth/forgot-password" (click)="close()">Quên mật khẩu?</a>
+      </div>
+
+      <div class="form-error" *ngIf="loginError">{{ loginError }}</div>
+
+      <button type="submit" class="btn btn-primary btn-lg submit-btn" [disabled]="loginLoading">
+        <span *ngIf="!loginLoading">Đăng nhập</span>
+        <span *ngIf="loginLoading" class="spinner-small"></span>
+        <span *ngIf="loginLoading">Đang đăng nhập...</span>
+      </button>
+    </form>
+
+    <p class="switch-hint">
+      Chưa có tài khoản?
+      <button class="link-btn" (click)="switchTab('register')">Đăng ký ngay</button>
+    </p>
+  </div>
+
+  <!-- ==================== FORM ĐĂNG KÝ ==================== -->
+  <div class="tab-content" [class.active]="activeTab === 'register'">
+    <div class="modal-brand">
+      <span class="material-icons">beach_access</span>
+      <span>Du Lịch Việt</span>
+    </div>
+    <h2>Tạo tài khoản mới</h2>
+    <p class="modal-sub">Tham gia cùng hàng ngàn du khách</p>
+
+    <form (ngSubmit)="onRegister()">
+      <div class="form-group">
+        <div class="input-icon-wrap">
+          <span class="field-icon material-icons">person</span>
+          <input type="text" [(ngModel)]="regFullName" name="regFullName" placeholder="Họ tên của bạn" [class.is-invalid]="regFieldErrors.fullName">
+        </div>
+        <span class="field-error" *ngIf="regFieldErrors.fullName">{{ regFieldErrors.fullName }}</span>
+      </div>
+
+      <div class="form-group">
+        <div class="input-icon-wrap">
+          <span class="field-icon material-icons">email</span>
+          <input type="email" [(ngModel)]="regEmail" name="regEmail" placeholder="Email" [class.is-invalid]="regFieldErrors.email">
+        </div>
+        <span class="field-error" *ngIf="regFieldErrors.email">{{ regFieldErrors.email }}</span>
+      </div>
+
+      <div class="form-group">
+        <div class="input-icon-wrap">
+          <span class="field-icon material-icons">phone</span>
+          <input type="tel" [(ngModel)]="regPhone" name="regPhone" placeholder="Số điện thoại" [class.is-invalid]="regFieldErrors.phone">
+        </div>
+        <span class="field-error" *ngIf="regFieldErrors.phone">{{ regFieldErrors.phone }}</span>
+      </div>
+
+      <div class="form-group">
+        <div class="input-icon-wrap password-field">
+          <span class="field-icon material-icons">lock</span>
+          <input [type]="regShowPassword ? 'text' : 'password'" [(ngModel)]="regPassword" name="regPassword" placeholder="Mật khẩu (tối thiểu 6 ký tự)" [class.is-invalid]="regFieldErrors.password">
+          <button
+            type="button"
+            class="toggle-password"
+            (click)="regShowPassword = !regShowPassword"
+            [attr.aria-label]="regShowPassword ? 'Ẩn mật khẩu' : 'Hiện mật khẩu'">
+            <span class="material-icons">{{ regShowPassword ? 'visibility_off' : 'visibility' }}</span>
+          </button>
+        </div>
+        <span class="field-error" *ngIf="regFieldErrors.password">{{ regFieldErrors.password }}</span>
+      </div>
+
+      <div class="form-group">
+        <div class="input-icon-wrap password-field">
+          <span class="field-icon material-icons">lock_reset</span>
+          <input [type]="regShowConfirmPassword ? 'text' : 'password'" [(ngModel)]="regConfirmPassword" name="regConfirmPassword" placeholder="Xác nhận mật khẩu" [class.is-invalid]="regFieldErrors.confirmPassword">
+          <button
+            type="button"
+            class="toggle-password"
+            (click)="regShowConfirmPassword = !regShowConfirmPassword"
+            [attr.aria-label]="regShowConfirmPassword ? 'Ẩn mật khẩu' : 'Hiện mật khẩu'">
+            <span class="material-icons">{{ regShowConfirmPassword ? 'visibility_off' : 'visibility' }}</span>
+          </button>
+        </div>
+        <span class="field-error" *ngIf="regFieldErrors.confirmPassword">{{ regFieldErrors.confirmPassword }}</span>
+      </div>
+
+      <div class="form-error" *ngIf="regError">{{ regError }}</div>
+
+      <button type="submit" class="btn btn-primary btn-lg submit-btn" [disabled]="regLoading">
+        <span *ngIf="!regLoading">Tạo tài khoản</span>
+        <span *ngIf="regLoading" class="spinner-small"></span>
+        <span *ngIf="regLoading">Đang đăng ký...</span>
+      </button>
+    </form>
+
+    <p class="switch-hint">
+      Đã có tài khoản?
+      <button class="link-btn" (click)="switchTab('login')">Đăng nhập</button>
+    </p>
+  </div>
+</div>

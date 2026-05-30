@@ -1,0 +1,129 @@
+
+<section class="section">
+  <div class="container">
+    <div class="admin-toolbar">
+      <div class="filter-status">
+        <select class="form-control" [(ngModel)]="filterStatus" (change)="page = 1; load()">
+          <option value="">Tất cả trạng thái</option>
+          <option value="pending">Chờ xử lý</option>
+          <option value="replied">Đã trả lời</option>
+          <option value="closed">Đã đóng</option>
+        </select>
+      </div>
+    </div>
+    <div class="loading-spinner" *ngIf="loading"><div class="spinner"></div></div>
+    <div class="data-table-wrapper" *ngIf="!loading">
+      <table class="data-table">
+        <thead><tr><th>Ngày</th><th>Người gửi</th><th>Tiêu đề</th><th>Loại</th><th>Trạng thái</th><th>Hành động</th></tr></thead>
+        <tbody>
+          <tr *ngFor="let i of data">
+            <td style="color:var(--gray);font-size:0.875rem;white-space:nowrap;">{{ i.createdAt | date:'dd/MM/yyyy' }}</td>
+            <td>
+              <div class="inquiry-sender">
+                <strong>{{ i.name }}</strong>
+                <span>{{ i.phone }}</span>
+              </div>
+            </td>
+            <td style="max-width:200px;"><span style="display:-webkit-box;-webkit-line-clamp:1;-webkit-box-orient:vertical;overflow:hidden;">{{ i.subject }}</span></td>
+            <td><span class="badge badge-primary">{{ i.type }}</span></td>
+            <td>
+              <select class="form-control" [(ngModel)]="i.status" (change)="updateStatus(i)" style="font-size:0.8125rem;padding:0.25rem 0.5rem;min-width:120px;">
+                <option value="pending">Chờ xử lý</option>
+                <option value="replied">Đã trả lời</option>
+                <option value="closed">Đã đóng</option>
+              </select>
+            </td>
+            <td>
+              <div class="action-btns">
+                <button type="button" class="btn btn-sm btn-outline" (click)="openDetail(i)" title="Xem chi tiết" aria-label="Xem chi tiết">
+                  <span class="material-icons">visibility</span>
+                </button>
+                <button type="button" class="btn btn-sm btn-danger" (click)="delete(i.id)" title="Xóa" aria-label="Xóa"><span class="material-icons">delete</span></button>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="empty-state" *ngIf="!loading && data.length === 0">
+      <span class="material-icons">inbox</span>
+      <h3>Không có yêu cầu nào</h3>
+    </div>
+    <div class="pagination-wrapper" *ngIf="!loading && totalPages > 1">
+      <div class="pagination-info">Hiển thị {{ data.length }} / {{ total }} yêu cầu</div>
+      <div class="pagination">
+        <button (click)="prev()" [disabled]="page === 1" class="page-nav">
+          <span class="material-icons">chevron_left</span>
+        </button>
+        <button *ngFor="let p of pageNumbers" [class.active]="p === page" [class.ellipsis]="p === '...'" (click)="goTo(p)" [disabled]="p === '...'">
+          {{ p }}
+        </button>
+        <button (click)="next()" [disabled]="page === totalPages" class="page-nav">
+          <span class="material-icons">chevron_right</span>
+        </button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="detail-modal-backdrop" *ngIf="selectedInquiry" (click)="closeDetail()">
+  <div class="detail-modal" (click)="$event.stopPropagation()">
+    <div class="detail-modal-header">
+      <div>
+        <span class="detail-eyebrow">Chi tiết yêu cầu</span>
+        <h3>{{ selectedInquiry.subject }}</h3>
+      </div>
+      <button type="button" class="modal-close" (click)="closeDetail()" aria-label="Đóng">
+        <span class="material-icons">close</span>
+      </button>
+    </div>
+
+    <div class="detail-status-row">
+      <span
+        class="status-pill"
+        [class.pending]="selectedInquiry.status === 'pending'"
+        [class.replied]="selectedInquiry.status === 'replied'"
+        [class.closed]="selectedInquiry.status === 'closed'">
+        {{ selectedInquiry.status === 'pending' ? 'Chờ xử lý' : (selectedInquiry.status === 'replied' ? 'Đã trả lời' : 'Đã đóng') }}
+      </span>
+      <span>{{ selectedInquiry.createdAt | date:'dd/MM/yyyy HH:mm' }}</span>
+    </div>
+
+    <div class="detail-grid">
+      <div class="detail-item">
+        <span>Người gửi</span>
+        <strong>{{ selectedInquiry.name }}</strong>
+      </div>
+      <div class="detail-item">
+        <span>Email</span>
+        <strong>{{ selectedInquiry.email }}</strong>
+      </div>
+      <div class="detail-item">
+        <span>Số điện thoại</span>
+        <strong>{{ selectedInquiry.phone || 'Chưa có' }}</strong>
+      </div>
+      <div class="detail-item">
+        <span>Loại yêu cầu</span>
+        <strong>{{ selectedInquiry.type }}</strong>
+      </div>
+      <div class="detail-item" *ngIf="selectedInquiry.tour?.name">
+        <span>Tour liên quan</span>
+        <strong>{{ selectedInquiry.tour.name }}</strong>
+      </div>
+      <div class="detail-item" *ngIf="selectedInquiry.user?.fullName">
+        <span>Tài khoản</span>
+        <strong>{{ selectedInquiry.user.fullName }}</strong>
+      </div>
+    </div>
+
+    <div class="detail-message">
+      <span>Nội dung</span>
+      <p>{{ selectedInquiry.message }}</p>
+    </div>
+
+    <div class="detail-message" *ngIf="selectedInquiry.reply">
+      <span>Phản hồi</span>
+      <p>{{ selectedInquiry.reply }}</p>
+    </div>
+  </div>
+</div>

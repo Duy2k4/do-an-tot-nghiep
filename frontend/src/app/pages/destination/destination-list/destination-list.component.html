@@ -1,0 +1,100 @@
+<div class="page-header ph-destinations">
+  <div class="container">
+    <h1>Điểm Đến Du Lịch</h1>
+    <p>Khám phá những địa điểm du lịch đẹp nhất Việt Nam</p>
+  </div>
+</div>
+
+<section class="section">
+  <div class="container">
+    <div class="filters-bar">
+      <div class="filter-search">
+        <span class="material-icons">search</span>
+        <input type="text" [(ngModel)]="filters.search" (ngModelChange)="onSearchChange()" placeholder="Tìm kiếm địa điểm..." class="search-input">
+      </div>
+      <div class="filter-chips">
+        <div class="chip-group">
+          <span class="material-icons chip-icon">category</span>
+          <select class="chip-select" [(ngModel)]="filters.category" (change)="loadDestinations()">
+            <option value="">Tất cả loại hình</option>
+            <option *ngFor="let c of categories" [value]="c.slug">{{ c.name }}</option>
+          </select>
+        </div>
+        <div class="chip-group">
+          <span class="material-icons chip-icon">public</span>
+          <select class="chip-select" [(ngModel)]="filters.region" (change)="loadDestinations()">
+            <option value="">Tất cả vùng miền</option>
+            <option value="NORTH">Miền Bắc</option>
+            <option value="CENTRAL">Miền Trung</option>
+            <option value="SOUTH">Miền Nam</option>
+          </select>
+        </div>
+        <div class="chip-group">
+          <span class="material-icons chip-icon">sort</span>
+          <select class="chip-select" [(ngModel)]="filters.sort" (change)="loadDestinations()">
+            <option value="createdAt">Mới nhất</option>
+            <option value="rating">Đánh giá cao</option>
+            <option value="reviewCount">Nhiều đánh giá</option>
+            <option value="viewCount">Phổ biến</option>
+          </select>
+        </div>
+        <button class="btn-clear" *ngIf="filters.category || filters.region || filters.search" (click)="clearFilters()">
+          <span class="material-icons">close</span> Xoá lọc
+        </button>
+      </div>
+    </div>
+
+    <div class="loading-spinner" *ngIf="loading">
+      <div class="spinner"></div>
+    </div>
+
+    <div class="grid grid-4" *ngIf="!loading">
+      <a *ngFor="let d of destinations" [routerLink]="['/destinations', d.slug]" class="card dest-card fade-in">
+        <div class="card-image" style="height:220px;">
+          <img [src]="d.images[0]?.url || 'https://picsum.photos/seed/' + d.slug + '/400/300'" [alt]="d.name">
+          <div class="card-img-overlay">
+            <span class="overlay-text"><span class="material-icons">explore</span> Khám phá</span>
+          </div>
+          <span class="badge badge-warning card-badge-top" *ngIf="d.isFeatured">Nổi bật</span>
+          <span class="view-count-badge">
+            <span class="material-icons">visibility</span> {{ d.viewCount | number }}
+          </span>
+        </div>
+        <div class="card-body">
+          <div class="card-category-pill">{{ d.category?.name }}</div>
+          <h3 class="card-title">{{ d.name }}</h3>
+          <p class="card-location">
+            <span class="material-icons">location_on</span>
+            {{ d.province?.name }}
+          </p>
+          <p class="short-desc">{{ d.shortDescription }}</p>
+          <div class="card-footer">
+            <span class="cost">{{ d.estimatedCost }} VNĐ</span>
+            <div class="rating">
+              <span class="score">{{ d.rating }}</span>
+              <span class="material-icons stars">star</span>
+              <span class="count">({{ d.reviewCount }})</span>
+            </div>
+          
+          </div>
+        </div>
+      </a>
+    </div>
+
+    <div class="empty-state" *ngIf="!loading && destinations.length === 0">
+      <span class="material-icons">search_off</span>
+      <h3>Không tìm thấy địa điểm nào</h3>
+      <p>Thử thay đổi bộ lọc hoặc từ khóa tìm kiếm</p>
+    </div>
+
+    <div class="pagination" *ngIf="!loading && pagination.totalPages > 1">
+      <button [disabled]="pagination.page <= 1" (click)="goToPage(pagination.page - 1)">
+        <span class="material-icons">chevron_left</span>
+      </button>
+      <button *ngFor="let p of pageNumbers" [class.active]="p === pagination.page" (click)="goToPage(p)">{{ p }}</button>
+      <button [disabled]="pagination.page >= pagination.totalPages" (click)="goToPage(pagination.page + 1)">
+        <span class="material-icons">chevron_right</span>
+      </button>
+    </div>
+  </div>
+</section>

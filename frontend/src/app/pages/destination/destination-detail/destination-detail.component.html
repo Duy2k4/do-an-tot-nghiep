@@ -1,0 +1,201 @@
+<div *ngIf="destination" class="fade-in">
+  <div class="detail-hero">
+    <img [src]="destination.images[0]?.url || 'https://picsum.photos/seed/' + destination.slug + '/1200/600'" [alt]="destination.name">
+    <div class="detail-hero-overlay">
+      <div class="container">
+        <div class="breadcrumb">
+          <a routerLink="/">Trang chủ</a>
+          <span class="material-icons">chevron_right</span>
+          <a routerLink="/destinations">Điểm đến</a>
+          <span class="material-icons">chevron_right</span>
+          <span>{{ destination.name }}</span>
+        </div>
+        <h1>{{ destination.name }}</h1>
+        <p><span class="material-icons">location_on</span> {{ destination.address }}</p>
+        <div class="detail-meta">
+          <span class="badge badge-warning" *ngIf="destination.isFeatured">Nổi bật</span>
+          <span class="badge badge-primary">{{ destination.category?.name }}</span>
+          <span class="rating">
+            <span class="score">{{ destination.rating }}</span>
+            <span class="material-icons stars">star</span>
+            <span>({{ destination.reviewCount }} đánh giá)</span>
+          </span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <section class="section">
+    <div class="container">
+      <div class="detail-layout">
+        <div class="detail-main">
+          <div class="gallery" *ngIf="destination.images?.length">
+            <div class="gallery-grid">
+              <img *ngFor="let img of destination.images.slice(0,4)" [src]="img.url" [alt]="img.caption">
+            </div>
+          </div>
+
+          <div class="content-section">
+            <h2>Giới thiệu</h2>
+            <div class="content" [innerHTML]="destination.description"></div>
+          </div>
+
+          <div class="info-cards grid grid-3">
+            <div class="info-card">
+              <span class="material-icons">schedule</span>
+              <h4>Thời gian đẹp nhất</h4>
+              <p>{{ destination.bestTime }}</p>
+            </div>
+            <div class="info-card">
+              <span class="material-icons">attach_money</span>
+              <h4>Chi phí ước tính</h4>
+              <p>{{ destination.estimatedCost }}</p>
+            </div>
+            <div class="info-card">
+              <span class="material-icons">visibility</span>
+              <h4>Lượt xem</h4>
+              <p>{{ destination.viewCount }}</p>
+            </div>
+          </div>
+
+          <div class="content-section" *ngIf="destination.highlights">
+            <h2>Điểm nổi bật</h2>
+            <div class="highlights-list">
+              <div *ngFor="let h of getHighlights()" class="highlight-item">
+                <span class="material-icons">check_circle</span>
+                {{ h }}
+              </div>
+            </div>
+          </div>
+
+          <div class="content-section" *ngIf="destination.tips">
+            <h2>Mẹo du lịch</h2>
+            <p>{{ destination.tips }}</p>
+          </div>
+
+          <div class="content-section">
+            <h2>Đánh giá ({{ destination.reviewCount }})</h2>
+
+            <!-- Đánh giá hiện có của người dùng -->
+            <div class="write-review" *ngIf="userReview && !isEditingReview">
+              <h4>Đánh giá của bạn</h4>
+              <div class="user-review-card">
+                <div class="review-avatar">
+                  <span class="material-icons">person</span>
+                </div>
+                <div class="review-content">
+                  <div class="review-header">
+                    <strong>{{ userReview.user?.fullName }}</strong>
+                    <span class="badge badge-success">Đã đánh giá</span>
+                    <div class="review-rating">
+                      <span *ngFor="let s of [1,2,3,4,5]" class="material-icons" [class.filled]="s <= userReview.rating">star</span>
+                    </div>
+                  </div>
+                  <p>{{ userReview.comment }}</p>
+                  <span class="review-date">{{ userReview.createdAt | date:'dd/MM/yyyy' }}</span>
+                  <div class="review-actions">
+                    <button class="btn btn-sm btn-outline" (click)="editReview()">
+                      <span class="material-icons">edit</span> Sửa
+                    </button>
+                    <button class="btn btn-sm btn-danger" (click)="deleteReview()">
+                      <span class="material-icons">delete</span> Xóa
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Sửa đánh giá hiện có -->
+            <div class="write-review" *ngIf="isEditingReview">
+              <h4>Chỉnh sửa đánh giá</h4>
+              <div class="rating-input">
+                <span *ngFor="let s of [1,2,3,4,5]" class="star" [class.filled]="s <= newReview.rating" (click)="newReview.rating = s">
+                  <span class="material-icons">{{ s <= newReview.rating ? 'star' : 'star_border' }}</span>
+                </span>
+              </div>
+              <textarea class="form-control" [(ngModel)]="newReview.comment" placeholder="Chia sẻ trải nghiệm của bạn..." rows="3"></textarea>
+              <div class="review-form-actions">
+                <button class="btn btn-outline" (click)="cancelEdit()">Hủy</button>
+                <button class="btn btn-primary" (click)="saveReview()" [disabled]="!newReview.rating || !newReview.comment.trim()">
+                  Lưu thay đổi
+                </button>
+              </div>
+            </div>
+
+            <!-- Viết đánh giá mới nếu chưa có đánh giá -->
+            <div class="write-review" *ngIf="auth.isLoggedIn() && !userReview && !isEditingReview">
+              <h4>Viết đánh giá của bạn</h4>
+              <div class="rating-input">
+                <span *ngFor="let s of [1,2,3,4,5]" class="star" [class.filled]="s <= newReview.rating" (click)="newReview.rating = s">
+                  <span class="material-icons">{{ s <= newReview.rating ? 'star' : 'star_border' }}</span>
+                </span>
+              </div>
+              <textarea class="form-control" [(ngModel)]="newReview.comment" placeholder="Chia sẻ trải nghiệm của bạn..." rows="3"></textarea>
+              <button class="btn btn-primary" (click)="submitReview()" [disabled]="!newReview.rating || !newReview.comment.trim()">
+                Gửi đánh giá
+              </button>
+              <p class="success-msg" *ngIf="reviewSuccess">Đánh giá đã được gửi!</p>
+            </div>
+            <div class="login-prompt" *ngIf="!auth.isLoggedIn()">
+              <p>Hãy <button type="button" class="inline-link" (click)="openLogin()">đăng nhập</button> để viết đánh giá.</p>
+            </div>
+
+            <div class="reviews-list">
+              <div *ngFor="let r of reviews" class="review-item">
+                <div class="review-avatar">
+                  <span class="material-icons">person</span>
+                </div>
+                <div class="review-content">
+                  <div class="review-header">
+                    <strong>{{ r.user?.fullName }}</strong>
+                    <div class="review-rating">
+                      <span *ngFor="let s of [1,2,3,4,5]" class="material-icons" [class.filled]="s <= r.rating">star</span>
+                    </div>
+                  </div>
+                  <p>{{ r.comment }}</p>
+                  <span class="review-date">{{ r.createdAt | date:'dd/MM/yyyy' }}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="detail-sidebar">
+          <div class="action-card card">
+            <div class="card-body">
+              <button class="btn btn-primary btn-lg" style="width:100%;" (click)="toggleFavorite()">
+                <span class="material-icons">{{ isFavorite ? 'favorite' : 'favorite_border' }}</span>
+                {{ isFavorite ? 'Đã yêu thích' : 'Thêm vào yêu thích' }}
+              </button>
+              <button class="btn btn-accent btn-lg" style="width:100%;margin-top:0.75rem;" routerLink="/contact">
+                <span class="material-icons">support_agent</span>
+                Yêu cầu tư vấn
+              </button>
+            </div>
+          </div>
+
+          <div class="related-section" *ngIf="relatedDestinations.length">
+            <h3>Địa điểm liên quan</h3>
+            <div *ngFor="let r of relatedDestinations" class="related-item">
+              <img [src]="r.images[0]?.url || 'https://picsum.photos/seed/' + r.slug + '/100/100'" [alt]="r.name">
+              <div>
+                <a [routerLink]="['/destinations', r.slug]">{{ r.name }}</a>
+                <p>{{ r.province?.name }}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+</div>
+
+<div class="loading-spinner" *ngIf="!destination && !loadingError">
+  <div class="spinner"></div>
+</div>
+
+<div class="empty-state" *ngIf="loadingError">
+  <span class="material-icons">error_outline</span>
+  <h3>Không tìm thấy địa điểm</h3>
+  <a routerLink="/destinations" class="btn btn-primary">Quay lại danh sách</a>
+</div>

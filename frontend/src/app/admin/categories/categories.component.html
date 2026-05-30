@@ -1,0 +1,116 @@
+<section class="categories-page">
+  <div class="category-tabs" role="tablist" aria-label="Loại danh mục">
+    <button
+      type="button"
+      role="tab"
+      [class.active]="activeTab === 'destinations'"
+      (click)="activeTab = 'destinations'">
+      <span class="material-icons">place</span>
+      Điểm đến
+    </button>
+    <button
+      type="button"
+      role="tab"
+      [class.active]="activeTab === 'articles'"
+      (click)="activeTab = 'articles'">
+      <span class="material-icons">article</span>
+      Bài viết
+    </button>
+  </div>
+
+  <div class="form-error page-error" *ngIf="error">{{ error }}</div>
+
+  <div class="categories-grid">
+    <div class="category-panel" [class.mobile-hidden]="activeTab !== 'destinations'">
+      <div class="category-panel-header">
+        <div class="category-title">
+          <span class="material-icons">place</span>
+          <div>
+            <h3>Điểm đến</h3>
+            <p>{{ destCategories.length }} danh mục</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="add-form">
+        <div class="add-input">
+          <input
+            type="text"
+            class="form-control"
+            [(ngModel)]="newDestCat"
+            placeholder="Tên danh mục mới"
+            [class.is-invalid]="fieldErrors['newDestCat']"
+            (keyup.enter)="add('destinations')">
+          <span class="field-error" *ngIf="fieldErrors['newDestCat']">{{ fieldErrors['newDestCat'] }}</span>
+        </div>
+        <button class="btn btn-primary btn-sm" (click)="add('destinations')">
+          <span class="material-icons">add</span>
+          Thêm
+        </button>
+      </div>
+
+      <div class="category-list">
+        <div *ngFor="let c of destCategories" class="cat-item">
+          <div class="cat-info">
+            <span class="cat-name">{{ c.name }}</span>
+            <span class="cat-count">{{ c._count?.destinations || 0 }} mục</span>
+          </div>
+          <button
+            class="btn btn-sm btn-danger"
+            type="button"
+            [disabled]="(c._count?.destinations || 0) > 0"
+            [title]="(c._count?.destinations || 0) > 0 ? 'Danh mục đang có nội dung nên không thể xóa' : 'Xóa danh mục'"
+            (click)="delete('destinations', c.id)">
+            <span class="material-icons">delete</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div class="category-panel" [class.mobile-hidden]="activeTab !== 'articles'">
+      <div class="category-panel-header">
+        <div class="category-title">
+          <span class="material-icons">article</span>
+          <div>
+            <h3>Bài viết</h3>
+            <p>{{ artCategories.length }} danh mục</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="add-form">
+        <div class="add-input">
+          <input
+            type="text"
+            class="form-control"
+            [(ngModel)]="newArtCat"
+            placeholder="Tên danh mục mới"
+            [class.is-invalid]="fieldErrors['newArtCat']"
+            (keyup.enter)="add('articles')">
+          <span class="field-error" *ngIf="fieldErrors['newArtCat']">{{ fieldErrors['newArtCat'] }}</span>
+        </div>
+        <button class="btn btn-primary btn-sm" (click)="add('articles')">
+          <span class="material-icons">add</span>
+          Thêm
+        </button>
+      </div>
+
+      <div class="category-list">
+        <div *ngFor="let c of artCategories" class="cat-item">
+          <div class="cat-info">
+            <span class="cat-name">{{ c.name }}</span>
+            <span class="cat-count">{{ c._count?.articles || 0 }} mục</span>
+          </div>
+          <button
+            class="btn btn-sm btn-danger"
+            type="button"
+            [disabled]="(c._count?.articles || 0) > 0"
+            [title]="(c._count?.articles || 0) > 0 ? 'Danh mục đang có nội dung nên không thể xóa' : 'Xóa danh mục'"
+            (click)="delete('articles', c.id)">
+            <span class="material-icons">delete</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>

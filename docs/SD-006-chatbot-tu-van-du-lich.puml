@@ -1,0 +1,56 @@
+@startuml
+title Sequence - SD-006: Su dung chatbot tu van du lich
+
+skinparam monochrome true
+skinparam shadowing false
+skinparam defaultFontName Arial
+skinparam defaultFontSize 14
+skinparam sequence {
+  ArrowColor Black
+  LifeLineBorderColor Black
+  LifeLineBackgroundColor White
+  ParticipantBorderColor Black
+  ParticipantBackgroundColor White
+  ActorBorderColor Black
+  ActorBackgroundColor White
+  DatabaseBorderColor Black
+  DatabaseBackgroundColor White
+}
+
+actor "Nguoi dung" as User
+boundary "Chatbot Widget" as UI
+control "Chatbot API\n/api/chatbot" as API
+control "DeepSeek API" as AI
+database "Co so du lieu\nKnowledge Base" as DB
+
+autonumber 1
+
+User -> UI: Mo chatbot widget
+User -> UI: Nhap cau hoi hoac chon goi y nhanh
+UI -> UI: Hien thi tin nhan nguoi dung\nva trang thai dang nhap
+UI -> API: POST message + sessionId\n+ token neu dang nhap
+
+API -> API: Validate message\nLay userId, tao sessionId neu chua co
+API -> DB: Luu tin nhan nguoi dung
+DB --> API: Xac nhan
+
+API -> DB: Lay context Knowledge Base\ndia diem, tour, bai viet, danh muc
+DB --> API: Tra ve database context
+
+API -> API: Tao system prompt\nkem context du lich
+API -> AI: Gui system prompt + cau hoi nguoi dung
+AI -> AI: Phan tich ngu nghia cau hoi\nva tong hop cau tra loi
+AI --> API: Tra ve noi dung phan hoi
+
+API -> API: Tach marker [card:slug]\nva tim dia diem duoc nhac toi
+API -> DB: Query card dia diem lien quan
+DB --> API: Tra ve danh sach card
+
+API -> DB: Luu tin nhan assistant\nkem metadata model/error
+DB --> API: Xac nhan
+
+API --> UI: Tra ve reply + sessionId + cards
+UI -> UI: Hien thi phan hoi\nva card dia diem neu co
+UI --> User: Xem cau tra loi tu van
+
+@enduml

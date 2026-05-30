@@ -1,0 +1,51 @@
+.pricing-hero { display: flex; align-items: baseline; gap: 0.75rem; margin-top: 0.75rem; .old { text-decoration: line-through; font-size: 1.125rem; opacity: 0.7; } .current { font-size: 2rem; font-weight: 700; color: #f59e0b; } }
+
+.detail-layout { display: grid; grid-template-columns: 1fr 340px; gap: 2rem; @media(max-width:768px){grid-template-columns:1fr;} }
+
+.content-section { margin-bottom: 2.5rem; h2 { font-size: 1.5rem; margin-bottom: 1rem; padding-bottom: 0.75rem; border-bottom: 2px solid var(--primary); display: flex; align-items: center; gap: 0.5rem; } }
+
+.includes-list {
+  display: grid;
+  grid-template-columns: repeat(2,1fr);
+  gap: 0.75rem;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  li {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.75rem;
+    padding: 0.75rem 1rem;
+    background: rgba(25,135,84,0.06);
+    border-radius: var(--border-radius-sm);
+    .material-icons { color: var(--secondary); font-size: 1.25rem; flex-shrink: 0; margin-top: 0.125rem; }
+  }
+}
+
+.schedule { display: flex; flex-direction: column; gap: 1rem; }
+.schedule-item {
+  background: var(--white);
+  border-radius: var(--border-radius);
+  padding: 1.5rem;
+  border: 1px solid #f1f5f9;
+  position: relative;
+  padding-left: 3.5rem;
+  &::before {
+    content: '';
+    position: absolute;
+    left: 1.25rem;
+    top: 0;
+    bottom: 0;
+    width: 3px;
+    background: linear-gradient(to bottom, var(--primary), var(--secondary));
+    border-radius: 2px;
+  }
+}
+.schedule-header { display: flex; gap: 0.75rem; margin-bottom: 0.5rem; align-items: center; .day { font-weight: 700; color: var(--primary); font-size: 0.875rem; background: rgba(13,110,253,0.1); padding: 0.25rem 0.75rem; border-radius: 50px; } .time { color: var(--gray); font-size: 0.8125rem; } }
+.schedule-item h4 { margin-bottom: 0.5rem; }
+.schedule-item p { color: var(--gray-dark); line-height: 1.6; margin-bottom: 0.5rem; }
+.schedule-item .location { display: flex; align-items: center; gap: 0.25rem; color: var(--gray); font-size: 0.875rem; margin: 0; .material-icons { font-size: 1rem; color: var(--primary); } }
+
+.booking-card { position: sticky; top: 90px; border: 1px solid #f1f5f9; }
+.price-display { display: flex; align-items: baseline; gap: 0.5rem; margin-bottom: 1.25rem; .old { text-decoration: line-through; color: var(--gray-light); font-size: 0.9375rem; } .current { font-size: 1.75rem; font-weight: 700; color: var(--danger); } .per { color: var(--gray); font-size: 0.875rem; } }
+.info-row { display: flex; align-items: center; gap: 0.75rem; padding: 0.625rem 0; border-bottom: 1px solid #f1f5f9; font-size: 0.9375rem; .material-icons { color: var(--primary); font-size: 1.25rem; } }

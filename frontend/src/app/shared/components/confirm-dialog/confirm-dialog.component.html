@@ -1,0 +1,24 @@
+<div class="confirm-overlay" *ngIf="options" (click)="cancel()"></div>
+
+<div class="confirm-dialog" *ngIf="options" role="dialog" aria-modal="true">
+  <button type="button" class="confirm-close" (click)="cancel()" aria-label="Đóng">
+    <span class="material-icons">close</span>
+  </button>
+
+  <div class="confirm-icon">
+    <span class="material-icons">{{ options.icon || 'delete' }}</span>
+  </div>
+
+  <h3>{{ options.title }}</h3>
+  <p>{{ options.message }}</p>
+
+  <div class="confirm-actions">
+    <button type="button" class="btn btn-outline" (click)="cancel()">
+      {{ options.cancelText || 'Hủy' }}
+    </button>
+    <button type="button" class="btn btn-danger" (click)="confirm()">
+      <span class="material-icons">delete</span>
+      {{ options.confirmText || 'Xóa' }}
+    </button>
+  </div>
+</div>

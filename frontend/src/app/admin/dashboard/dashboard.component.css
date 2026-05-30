@@ -1,0 +1,68 @@
+.stats-row {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.stat-sm {
+  flex: 1 1 calc(14.28% - 1rem);
+  min-width: 100px;
+  padding: 0.875rem 0.75rem !important;
+  .stat-icon {
+    width: 32px;
+    height: 32px;
+    .material-icons { font-size: 1rem; }
+  }
+  .stat-value { font-size: 1.25rem; }
+  .stat-label { font-size: 0.75rem; }
+}
+
+.chart-card {
+  padding: 1rem;
+  .card-body {
+    padding: 0;
+    position: relative;
+  }
+}
+
+#lineChart, #columnChart, #pieChart {
+  width: 100%;
+  height: 300px;
+}
+
+.no-data-chart {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  color: var(--gray-light);
+  .material-icons { font-size: 3rem; }
+  p { margin: 0; font-size: 0.875rem; }
+}
+
+.mini-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.75rem 0;
+  border-bottom: 1px solid #f1f5f9;
+  font-size: 0.9375rem;
+  &:last-child { border-bottom: none; }
+}
+
+.empty-mini {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 2rem;
+  color: var(--gray);
+  gap: 0.5rem;
+  .material-icons { font-size: 2rem; }
+  p { margin: 0; font-size: 0.875rem; }
+}

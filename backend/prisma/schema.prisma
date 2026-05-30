@@ -1,0 +1,347 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+// ==================== NGƯỜI DÙNG & XÁC THỰC ====================
+
+model Role {
+  id    String @id @default(uuid())
+  name  String @unique // admin, user
+  users User[]
+
+  @@map("roles")
+}
+
+model User {
+  id                String    @id @default(uuid())
+  email             String    @unique
+  password          String
+  fullName          String
+  phone             String?
+  avatar            String?
+  isActive          Boolean   @default(true)
+  roleId            String
+  role              Role      @relation(fields: [roleId], references: [id])
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+
+  reviews           Review[]
+  favorites         Favorite[]
+  inquiries         Inquiry[]
+  chatbotHistories  ChatbotHistory[]
+  recommendationLogs RecommendationLog[]
+  articles         Article[]
+
+  @@map("users")
+}
+
+// ==================== ĐIỂM ĐẾN ====================
+
+model Province {
+  id          String        @id @default(uuid())
+  name        String
+  slug        String        @unique
+  region      String        // NORTH, CENTRAL, SOUTH
+  destinations Destination[]
+
+  @@map("provinces")
+}
+
+model DestinationCategory {
+  id           String        @id @default(uuid())
+  name         String
+  slug         String        @unique
+  icon         String?
+  description  String?       @db.Text
+  destinations Destination[]
+
+  @@map("destination_categories")
+}
+
+model Destination {
+  id                String                @id @default(uuid())
+  name              String
+  slug              String                @unique
+  description       String                @db.Text
+  shortDescription  String?               @db.Text
+  address           String
+  provinceId        String
+  province          Province              @relation(fields: [provinceId], references: [id])
+  categoryId        String
+  category          DestinationCategory   @relation(fields: [categoryId], references: [id])
+  latitude          Float?
+  longitude         Float?
+  bestTime          String                // "Tháng 3-5", "Quanh năm"
+  estimatedCost     String?               // "500000-1000000"
+  rating            Float                 @default(0)
+  reviewCount       Int                   @default(0)
+  viewCount         Int                   @default(0)
+  tips              String?               @db.Text
+  highlights        String?               @db.Text // JSON array stored as string
+  isFeatured        Boolean               @default(false)
+  isActive          Boolean               @default(true)
+  createdAt         DateTime              @default(now())
+  updatedAt         DateTime              @updatedAt
+
+  images            DestinationImage[]
+  reviews           Review[]
+  favorites         Favorite[]
+  tags              DestinationTag[]
+  relatedFrom       DestinationRelation[]  @relation("DestinationFrom")
+  relatedTo         DestinationRelation[]  @relation("DestinationTo")
+  tours             Tour[]
+
+  @@map("destinations")
+}
+
+model DestinationImage {
+  id            String       @id @default(uuid())
+  destinationId String
+  destination   Destination  @relation(fields: [destinationId], references: [id], onDelete: Cascade)
+  url           String
+  caption       String?
+  isPrimary     Boolean      @default(false)
+  sortOrder     Int          @default(0)
+  createdAt     DateTime     @default(now())
+
+  @@map("destination_images")
+}
+
+model Tag {
+  id           String           @id @default(uuid())
+  name         String
+  slug         String           @unique
+  destinations DestinationTag[]
+
+  @@map("tags")
+}
+
+model DestinationTag {
+  destinationId String
+  tagId        String
+  destination  Destination @relation(fields: [destinationId], references: [id], onDelete: Cascade)
+  tag          Tag         @relation(fields: [tagId], references: [id], onDelete: Cascade)
+
+  @@id([destinationId, tagId])
+  @@map("destination_tags")
+}
+
+model DestinationRelation {
+  id          String      @id @default(uuid())
+  fromId      String
+  toId        String
+  from        Destination @relation("DestinationFrom", fields: [fromId], references: [id], onDelete: Cascade)
+  to          Destination @relation("DestinationTo", fields: [toId], references: [id], onDelete: Cascade)
+
+  @@map("destination_relations")
+}
+
+// ==================== TOUR ====================
+
+model Tour {
+  id             String         @id @default(uuid())
+  name           String
+  slug           String         @unique
+  description    String         @db.Text
+  shortDescription String?       @db.Text
+  destinationId  String?
+  destination    Destination?   @relation(fields: [destinationId], references: [id])
+  duration       String         // "3 ngày 2 đêm"
+  maxPeople      Int
+  price          Float
+  discountPrice  Float?
+  includes       String?         @db.Text // JSON array
+  excludes       String?         @db.Text // JSON array
+  imageUrl       String?
+  images         TourImage[]
+  isFeatured     Boolean        @default(false)
+  isActive       Boolean        @default(true)
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime       @updatedAt
+
+  schedules      TourSchedule[]
+  reviews        Review[]
+  inquiries      Inquiry[]
+
+  @@map("tours")
+}
+
+model TourImage {
+  id         String   @id @default(uuid())
+  tourId     String
+  tour       Tour     @relation(fields: [tourId], references: [id], onDelete: Cascade)
+  url        String
+  caption    String?
+  isPrimary  Boolean  @default(false)
+  sortOrder  Int      @default(0)
+
+  @@map("tour_images")
+}
+
+model TourSchedule {
+  id          String @id @default(uuid())
+  tourId      String
+  tour        Tour   @relation(fields: [tourId], references: [id], onDelete: Cascade)
+  day         Int    // Ngày 1, Ngày 2...
+  time        String // "Sáng", "Chiều", "Tối"
+  title       String
+  description String @db.Text
+  location    String?
+
+  @@map("tour_schedules")
+}
+
+// ==================== BÀI VIẾT ====================
+
+model ArticleCategory {
+  id        String    @id @default(uuid())
+  name      String
+  slug      String    @unique
+  icon      String?
+  articles  Article[]
+
+  @@map("article_categories")
+}
+
+model Article {
+  id           String           @id @default(uuid())
+  title        String
+  slug         String           @unique
+  content      String           @db.Text
+  excerpt      String?          @db.Text
+  imageUrl     String?
+  categoryId   String
+  category     ArticleCategory  @relation(fields: [categoryId], references: [id])
+  authorId     String?
+  author       User?            @relation(fields: [authorId], references: [id])
+  tags         String?          // comma-separated
+  viewCount    Int              @default(0)
+  isFeatured   Boolean          @default(false)
+  isPublished  Boolean          @default(true)
+  publishedAt  DateTime?
+  createdAt    DateTime         @default(now())
+  updatedAt    DateTime         @updatedAt
+
+  images       ArticleImage[]
+
+  @@map("articles")
+}
+
+model ArticleImage {
+  id        String   @id @default(uuid())
+  articleId String
+  article   Article  @relation(fields: [articleId], references: [id], onDelete: Cascade)
+  url       String
+  caption   String?
+  isPrimary Boolean  @default(false)
+  sortOrder Int      @default(0)
+  createdAt DateTime @default(now())
+
+  @@map("article_images")
+}
+
+// ==================== ĐÁNH GIÁ ====================
+
+model Review {
+  id            String      @id @default(uuid())
+  userId        String
+  user          User        @relation(fields: [userId], references: [id])
+  rating        Int         // 1-5
+  comment       String      @db.Text
+  destinationId String?
+  destination   Destination? @relation(fields: [destinationId], references: [id], onDelete: Cascade)
+  tourId        String?
+  tour          Tour?       @relation(fields: [tourId], references: [id], onDelete: Cascade)
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+
+  @@map("reviews")
+}
+
+// ==================== YÊU THÍCH ====================
+
+model Favorite {
+  id            String      @id @default(uuid())
+  userId        String
+  user          User        @relation(fields: [userId], references: [id])
+  destinationId String
+  destination   Destination @relation(fields: [destinationId], references: [id], onDelete: Cascade)
+  createdAt     DateTime    @default(now())
+
+  @@unique([userId, destinationId])
+  @@map("favorites")
+}
+
+// ==================== YÊU CẦU TƯ VẤN ====================
+
+model Inquiry {
+  id          String    @id @default(uuid())
+  name        String
+  email       String
+  phone       String?
+  type        String    // contact, tour, destination
+  subject     String
+  message     String    @db.Text
+  status      String    @default("pending") // pending, replied, closed
+  userId      String?
+  user        User?     @relation(fields: [userId], references: [id])
+  tourId      String?
+  tour        Tour?     @relation(fields: [tourId], references: [id])
+  reply       String?   @db.Text
+  repliedAt   DateTime?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@map("inquiries")
+}
+
+// ==================== CHATBOT ====================
+
+model ChatbotHistory {
+  id        String   @id @default(uuid())
+  userId    String?
+  user      User?    @relation(fields: [userId], references: [id])
+  sessionId String
+  role      String   // user, assistant
+  message   String   @db.Text
+  metadata  String?  @db.Text // JSON
+  createdAt DateTime @default(now())
+
+  @@map("chatbot_histories")
+}
+
+// ==================== CÀI ĐẶT TRANG ====================
+
+model SiteSetting {
+  id        String   @id @default(uuid())
+  key       String   @unique
+  value     String   @db.Text
+  group     String   @default("general") // general, contact, social, seo
+  label     String
+  type      String   @default("text") // text, textarea, number, boolean, json
+  isPublic  Boolean  @default(true) // visible in public API
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("site_settings")
+}
+
+// ==================== GỢI Ý ====================
+
+model RecommendationLog {
+  id          String   @id @default(uuid())
+  userId      String?
+  user        User?    @relation(fields: [userId], references: [id])
+  sessionId   String
+  preferences String?  @db.Text // JSON
+  results     String?  @db.Text // JSON array of destination IDs
+  algorithm   String   // rule-based, ai, etc.
+  createdAt   DateTime @default(now())
+
+  @@map("recommendation_logs")
+}

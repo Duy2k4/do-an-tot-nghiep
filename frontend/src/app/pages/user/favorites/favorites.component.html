@@ -1,0 +1,56 @@
+<section class="section favorites-section">
+  <div class="container">
+    <div class="user-page-heading">
+      <div>
+        <h1>Địa điểm yêu thích</h1>
+      </div>
+      <a routerLink="/destinations" class="btn btn-primary">
+        <span class="material-icons">explore</span>
+        Khám phá thêm
+      </a>
+    </div>
+
+    <div class="loading-spinner" *ngIf="loading"><div class="spinner"></div></div>
+
+    <div class="favorites-grid" *ngIf="!loading && favorites.length">
+      <a
+        *ngFor="let f of favorites"
+        [routerLink]="['/destinations', f.destination.slug]"
+        class="favorite-card fade-in">
+        <div class="favorite-image">
+          <img
+            [src]="f.destination.images?.[0]?.url || 'https://picsum.photos/seed/' + f.destination.slug + '/500/360'"
+            [alt]="f.destination.name">
+          <span class="favorite-badge">
+            <span class="material-icons">favorite</span>
+          </span>
+        </div>
+        <div class="favorite-body">
+          <span class="favorite-category">{{ f.destination.category?.name || 'Điểm đến' }}</span>
+          <h3>{{ f.destination.name }}</h3>
+          <p class="favorite-location">
+            <span class="material-icons">location_on</span>
+            {{ f.destination.province?.name }}
+          </p>
+          <div class="favorite-footer">
+            <div class="rating">
+              <span class="score">{{ f.destination.rating || 0 }}</span>
+              <span class="material-icons stars">star</span>
+            </div>
+            <span class="view-link">
+              Xem chi tiết
+              <span class="material-icons">arrow_forward</span>
+            </span>
+          </div>
+        </div>
+      </a>
+    </div>
+
+    <div class="empty-state favorite-empty" *ngIf="!loading && favorites.length === 0">
+      <span class="material-icons">favorite_border</span>
+      <h3>Chưa có địa điểm yêu thích</h3>
+      <p>Nhấn biểu tượng yêu thích ở trang điểm đến để lưu lại nơi bạn quan tâm.</p>
+      <a routerLink="/destinations" class="btn btn-primary">Khám phá ngay</a>
+    </div>
+  </div>
+</section>

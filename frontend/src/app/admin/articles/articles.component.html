@@ -1,0 +1,51 @@
+
+<section class="section">
+  <div class="container">
+    <div class="admin-toolbar">
+      <div class="toolbar-search">
+        <span class="material-icons">search</span>
+        <input type="text" class="form-control" [(ngModel)]="search" (ngModelChange)="page = 1; load()" placeholder="Tìm kiếm bài viết...">
+      </div>
+      <a routerLink="/admin/articles/create" class="btn btn-primary"><span class="material-icons">add</span> Thêm mới</a>
+    </div>
+    <div class="loading-spinner" *ngIf="loading"><div class="spinner"></div></div>
+    <div class="data-table-wrapper" *ngIf="!loading">
+      <table class="data-table">
+        <thead><tr><th>Ảnh</th><th>Tiêu đề</th><th>Danh mục</th><th>Lượt xem</th><th>Trạng thái</th><th>Hành động</th></tr></thead>
+        <tbody>
+          <tr *ngFor="let a of data">
+            <td><img [src]="a.imageUrl ? api.mediaUrl(a.imageUrl) : 'https://picsum.photos/seed/' + a.slug + '/60/60'" alt="" style="width:50px;height:50px;object-fit:cover;border-radius:8px;"></td>
+            <td><strong style="display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;max-width:300px;">{{ a.title }}</strong></td>
+            <td><span class="badge badge-primary">{{ a.category?.name }}</span></td>
+            <td><span class="material-icons" style="font-size:0.875rem;vertical-align:middle;color:var(--gray);">visibility</span> {{ a.viewCount }}</td>
+            <td><span class="badge" [class.badge-success]="a.isPublished" [class.badge-warning]="!a.isPublished">{{ a.isPublished ? 'Đã đăng' : 'Bản nháp' }}</span></td>
+            <td>
+              <div class="action-btns">
+                <a [routerLink]="['/admin/articles/edit', a.id]" class="btn btn-sm btn-outline"><span class="material-icons">edit</span></a>
+                <button class="btn btn-sm btn-danger" (click)="delete(a.id)"><span class="material-icons">delete</span></button>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="empty-state" *ngIf="!loading && data.length === 0">
+      <span class="material-icons">article</span>
+      <h3>Không có bài viết</h3>
+    </div>
+    <div class="pagination-wrapper" *ngIf="!loading && totalPages > 1">
+      <div class="pagination-info">Hiển thị {{ data.length }} / {{ total }} bài viết</div>
+      <div class="pagination">
+        <button (click)="prev()" [disabled]="page === 1" class="page-nav">
+          <span class="material-icons">chevron_left</span>
+        </button>
+        <button *ngFor="let p of pageNumbers" [class.active]="p === page" [class.ellipsis]="p === '...'" (click)="goTo(p)" [disabled]="p === '...'">
+          {{ p }}
+        </button>
+        <button (click)="next()" [disabled]="page === totalPages" class="page-nav">
+          <span class="material-icons">chevron_right</span>
+        </button>
+      </div>
+    </div>
+  </div>
+</section>

@@ -1,0 +1,380 @@
+
+<section class="section">
+  <div class="container container-sm">
+    <div class="card"><div class="card-body">
+      <form (ngSubmit)="save()">
+        <div class="form-group"><label>Tiêu đề <span class="text-danger">*</span></label><input type="text" class="form-control" [(ngModel)]="form.title" name="title" required [class.is-invalid]="fieldErrors['title']"><span class="field-error" *ngIf="fieldErrors['title']">{{ fieldErrors['title'] }}</span></div>
+        <div class="form-group"><label>Danh mục <span class="text-danger">*</span></label><select class="form-control" [(ngModel)]="form.categoryId" name="categoryId" required [class.is-invalid]="fieldErrors['categoryId']"><option value="">Chọn danh mục</option><option *ngFor="let c of categories" [value]="c.id">{{ c.name }}</option></select><span class="field-error" *ngIf="fieldErrors['categoryId']">{{ fieldErrors['categoryId'] }}</span></div>
+        <div class="form-group"><label>Tóm tắt</label><textarea class="form-control" [(ngModel)]="form.excerpt" name="excerpt" rows="2" [class.is-invalid]="fieldErrors['excerpt']"></textarea><span class="field-error" *ngIf="fieldErrors['excerpt']">{{ fieldErrors['excerpt'] }}</span></div>
+        
+        <!-- Trình soạn thảo HTML -->
+        <div class="form-group">
+          <label>Nội dung HTML <span class="text-danger">*</span></label>
+          <div class="html-editor">
+            <!-- Thanh công cụ -->
+            <div class="editor-toolbar">
+              <div class="toolbar-group">
+                <select class="toolbar-select" (change)="formatBlock($event)">
+                  <option value="">Định dạng</option>
+                  <option value="h1">Tiêu đề 1</option>
+                  <option value="h2">Tiêu đề 2</option>
+                  <option value="h3">Tiêu đề 3</option>
+                  <option value="p">Đoạn văn</option>
+                </select>
+              </div>
+              <div class="toolbar-divider"></div>
+              <div class="toolbar-group">
+                <button type="button" class="toolbar-btn" (click)="execCmd('bold')" title="In đậm">
+                  <span class="material-icons">format_bold</span>
+                </button>
+                <button type="button" class="toolbar-btn" (click)="execCmd('italic')" title="In nghiêng">
+                  <span class="material-icons">format_italic</span>
+                </button>
+                <button type="button" class="toolbar-btn" (click)="execCmd('underline')" title="Gạch chân">
+                  <span class="material-icons">format_underlined</span>
+                </button>
+              </div>
+              <div class="toolbar-divider"></div>
+              <div class="toolbar-group">
+                <button type="button" class="toolbar-btn" (click)="execCmd('insertUnorderedList')" title="Danh sách không thứ tự">
+                  <span class="material-icons">format_list_bulleted</span>
+                </button>
+                <button type="button" class="toolbar-btn" (click)="execCmd('insertOrderedList')" title="Danh sách có thứ tự">
+                  <span class="material-icons">format_list_numbered</span>
+                </button>
+              </div>
+              <div class="toolbar-divider"></div>
+              <div class="toolbar-group">
+                <button type="button" class="toolbar-btn" (click)="execCmd('justifyLeft')" title="Căn trái">
+                  <span class="material-icons">format_align_left</span>
+                </button>
+                <button type="button" class="toolbar-btn" (click)="execCmd('justifyCenter')" title="Căn giữa">
+                  <span class="material-icons">format_align_center</span>
+                </button>
+                <button type="button" class="toolbar-btn" (click)="execCmd('justifyRight')" title="Căn phải">
+                  <span class="material-icons">format_align_right</span>
+                </button>
+              </div>
+              <div class="toolbar-divider"></div>
+              <div class="toolbar-group">
+                <button type="button" class="toolbar-btn" (click)="insertLink()" title="Chèn liên kết">
+                  <span class="material-icons">link</span>
+                </button>
+                <button type="button" class="toolbar-btn" (click)="insertImage()" title="Chèn hình ảnh">
+                  <span class="material-icons">image</span>
+                </button>
+              </div>
+              <div class="toolbar-divider"></div>
+              <div class="toolbar-group">
+                <button type="button" class="toolbar-btn" (click)="execCmd('removeFormat')" title="Xóa định dạng">
+                  <span class="material-icons">format_clear</span>
+                </button>
+              </div>
+            </div>
+            <!-- Khu vực soạn thảo -->
+            <div class="editor-content" 
+                 #editorContent
+                 contenteditable="true"
+                 (input)="onContentChange()"
+                 [class.is-invalid]="fieldErrors['content']"
+                 [attr.data-placeholder]="'Nhập nội dung bài viết...'">
+            </div>
+          </div>
+          <span class="field-error" *ngIf="fieldErrors['content']">{{ fieldErrors['content'] }}</span>
+        </div>
+        
+        <!-- Khu vực tải ảnh -->
+        <div class="form-group">
+          <label>Hình ảnh bài viết</label>
+          
+          <!-- Khu vực tải lên -->
+          <div class="upload-area" (click)="fileInput.click()">
+            <input #fileInput type="file" multiple accept="image/*" (change)="onFileSelect($event)" style="display: none;">
+            <div class="upload-placeholder">
+              <span class="material-icons">cloud_upload</span>
+              <p>Click để chọn nhiều hình ảnh</p>
+              <small>Hỗ trợ: JPG, PNG, GIF, WebP (tối đa 5MB mỗi ảnh)</small>
+            </div>
+          </div>
+          
+          <!-- Lưới xem trước ảnh -->
+          <div class="image-preview-grid" *ngIf="images.length > 0">
+            <div class="image-preview-item" *ngFor="let img of images; let i = index">
+              <img [src]="img.preview || api.mediaUrl(img.url)" alt="Preview">
+              <div class="image-actions">
+                <button type="button" class="btn-icon" (click)="setPrimary(i)" [class.primary]="i === 0" title="Đặt làm ảnh chính">
+                  <span class="material-icons">star</span>
+                </button>
+                <button type="button" class="btn-icon delete" (click)="removeImage(i)" title="Xóa">
+                  <span class="material-icons">delete</span>
+                </button>
+              </div>
+              <span class="primary-badge" *ngIf="i === 0">Ảnh chính</span>
+              <div class="caption-input">
+                <input type="text" [(ngModel)]="img.caption" [name]="'caption_' + i" placeholder="Mô tả ảnh..." class="form-control form-control-sm">
+              </div>
+            </div>
+          </div>
+          
+          <!-- Thông báo chưa có ảnh -->
+          <div class="no-images" *ngIf="images.length === 0">
+            <small class="text-muted">Chưa có hình ảnh nào. Click bên trên để tải lên.</small>
+          </div>
+        </div>
+        
+        <div class="form-group"><label>Tags (comma-separated)</label><input type="text" class="form-control" [(ngModel)]="form.tags" name="tags" placeholder="VD: sapa,mùa lúa chín"></div>
+        <div class="form-group"><label><input type="checkbox" [(ngModel)]="form.isFeatured" name="isFeatured"> Nổi bật</label></div>
+        <div class="form-group"><label><input type="checkbox" [(ngModel)]="form.isPublished" name="isPublished"> Xuất bản</label></div>
+        <div class="form-error" *ngIf="error">{{ error }}</div>
+        <div style="display:flex;gap:0.75rem;">
+          <button type="submit" class="btn btn-primary" [disabled]="loading || uploading">
+            {{ uploading ? 'Đang tải ảnh...' : (loading ? 'Đang lưu...' : 'Lưu') }}
+          </button>
+          <a routerLink="/admin/articles" class="btn btn-outline">Hủy</a>
+        </div>
+      </form>
+    </div></div>
+  </div>
+</section>
+
+<style>
+/* Kiểu khu vực tải lên */
+.upload-area {
+  border: 2px dashed #ccc;
+  border-radius: 8px;
+  padding: 2rem;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.3s;
+  background: #fafafa;
+}
+.upload-area:hover {
+  border-color: var(--primary);
+  background: #f0f7ff;
+}
+.upload-placeholder .material-icons {
+  font-size: 48px;
+  color: #aaa;
+}
+.upload-placeholder p {
+  margin: 0.5rem 0;
+  color: #666;
+  font-weight: 500;
+}
+.upload-placeholder small {
+  color: #999;
+}
+
+.image-preview-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 1rem;
+  margin-top: 1rem;
+}
+.image-preview-item {
+  position: relative;
+  border-radius: 8px;
+  overflow: hidden;
+  background: #f5f5f5;
+  border: 2px solid transparent;
+}
+.image-preview-item:first-child {
+  border-color: var(--primary);
+}
+.image-preview-item img {
+  width: 100%;
+  height: 120px;
+  object-fit: cover;
+}
+.image-actions {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  display: flex;
+  gap: 4px;
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+.image-preview-item:hover .image-actions {
+  opacity: 1;
+}
+.btn-icon {
+  width: 28px;
+  height: 28px;
+  border: none;
+  border-radius: 50%;
+  background: rgba(0,0,0,0.6);
+  color: white;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+}
+.btn-icon .material-icons {
+  font-size: 16px;
+}
+.btn-icon:hover {
+  background: rgba(0,0,0,0.8);
+}
+.btn-icon.primary {
+  background: var(--primary);
+}
+.btn-icon.delete:hover {
+  background: #dc3545;
+}
+.primary-badge {
+  position: absolute;
+  top: 4px;
+  left: 4px;
+  background: var(--primary);
+  color: white;
+  font-size: 10px;
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+.caption-input {
+  padding: 4px;
+}
+.form-control-sm {
+  padding: 4px 8px;
+  font-size: 12px;
+}
+.no-images {
+  margin-top: 0.5rem;
+}
+.text-muted {
+  color: #6c757d;
+}
+
+/* Kiểu trình soạn thảo HTML */
+.html-editor {
+  border: 2px solid #e2e8f0;
+  border-radius: var(--border-radius-sm);
+  overflow: hidden;
+  background: white;
+  transition: border-color 0.3s;
+}
+.html-editor:focus-within {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(13, 110, 253, 0.1);
+}
+
+.editor-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.5rem;
+  background: #f8fafc;
+  border-bottom: 1px solid #e2e8f0;
+  flex-wrap: wrap;
+}
+
+.toolbar-group {
+  display: flex;
+  gap: 2px;
+}
+
+.toolbar-divider {
+  width: 1px;
+  height: 24px;
+  background: #e2e8f0;
+  margin: 0 0.25rem;
+}
+
+.toolbar-btn {
+  width: 32px;
+  height: 32px;
+  border: none;
+  background: transparent;
+  border-radius: 4px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #4b5563;
+  transition: all 0.2s;
+}
+.toolbar-btn .material-icons {
+  font-size: 18px;
+}
+.toolbar-btn:hover {
+  background: #e2e8f0;
+  color: var(--primary);
+}
+.toolbar-btn:active {
+  background: #d1d5db;
+}
+
+.toolbar-select {
+  height: 32px;
+  padding: 0 0.5rem;
+  border: 1px solid #e2e8f0;
+  border-radius: 4px;
+  background: white;
+  font-size: 13px;
+  cursor: pointer;
+  color: #4b5563;
+}
+.toolbar-select:focus {
+  outline: none;
+  border-color: var(--primary);
+}
+
+.editor-content {
+  min-height: 300px;
+  padding: 1rem;
+  font-family: 'Nunito Sans', sans-serif;
+  font-size: 0.9375rem;
+  line-height: 1.7;
+  color: #374151;
+  outline: none;
+  overflow-y: auto;
+  max-height: 500px;
+}
+
+.editor-content:empty:before {
+  content: attr(data-placeholder);
+  color: #9ca3af;
+  pointer-events: none;
+}
+
+.editor-content h1 {
+  font-size: 1.75rem;
+  font-weight: 700;
+  margin: 1rem 0 0.5rem;
+  color: #1f2937;
+}
+.editor-content h2 {
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin: 0.875rem 0 0.5rem;
+  color: #1f2937;
+}
+.editor-content h3 {
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin: 0.75rem 0 0.5rem;
+  color: #1f2937;
+}
+.editor-content p {
+  margin: 0.5rem 0;
+}
+.editor-content ul, .editor-content ol {
+  margin: 0.5rem 0;
+  padding-left: 1.5rem;
+}
+.editor-content li {
+  margin: 0.25rem 0;
+}
+.editor-content a {
+  color: var(--primary);
+  text-decoration: underline;
+}
+.editor-content img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 8px;
+  margin: 0.5rem 0;
+}
+</style>

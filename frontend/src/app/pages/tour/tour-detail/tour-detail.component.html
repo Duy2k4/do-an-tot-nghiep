@@ -1,0 +1,70 @@
+<div *ngIf="tour" class="fade-in">
+  <div class="detail-hero">
+    <img [src]="tour.images?.[0]?.url ? api.mediaUrl(tour.images[0].url) : (tour.imageUrl ? api.mediaUrl(tour.imageUrl) : 'https://picsum.photos/seed/' + tour.slug + '/1200/600')" [alt]="tour.name">
+    <div class="detail-hero-overlay">
+      <div class="container">
+        <h1>{{ tour.name }}</h1>
+        <p><span class="material-icons">schedule</span> {{ tour.duration }} | {{ tour.maxPeople }} người</p>
+        <div class="pricing-hero">
+          <span class="old" *ngIf="tour.discountPrice">{{ tour.price | number:'1.0-0' }}đ</span>
+          <span class="current">{{ (tour.discountPrice || tour.price) | number:'1.0-0' }}đ</span>
+          <span class="per">/người</span>
+        </div>
+      </div>
+    </div>
+  </div>
+  <section class="section">
+    <div class="container">
+      <div class="detail-layout">
+        <div class="detail-main">
+          <div class="content-section">
+            <h2>Mô tả</h2>
+            <p>{{ tour.description }}</p>
+          </div>
+          <div class="content-section" *ngIf="tour.includes">
+            <h2>Bao gồm</h2>
+            <ul class="includes-list">
+              <li *ngFor="let item of getIncludes()"><span class="material-icons">check</span> {{ item }}</li>
+            </ul>
+          </div>
+          <div class="content-section" *ngIf="tour.schedules?.length">
+            <h2>Lịch trình</h2>
+            <div class="schedule">
+              <div *ngFor="let s of tour.schedules" class="schedule-item">
+                <div class="schedule-header">
+                  <span class="day">Ngày {{ s.day }}</span>
+                  <span class="time">{{ s.time }}</span>
+                </div>
+                <h4>{{ s.title }}</h4>
+                <p>{{ s.description }}</p>
+                <p *ngIf="s.location" class="location"><span class="material-icons">location_on</span> {{ s.location }}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="detail-sidebar">
+          <div class="booking-card card">
+            <div class="card-body">
+              <div class="price-display">
+                <span class="old" *ngIf="tour.discountPrice">{{ tour.price | number:'1.0-0' }}đ</span>
+                <span class="current">{{ (tour.discountPrice || tour.price) | number:'1.0-0' }}đ</span>
+                <span class="per">/người</span>
+              </div>
+              <div class="info-row"><span class="material-icons">schedule</span> {{ tour.duration }}</div>
+              <div class="info-row"><span class="material-icons">group</span> Tối đa {{ tour.maxPeople }} người</div>
+              <button class="btn btn-accent btn-lg" style="width:100%;" routerLink="/contact">
+                <span class="material-icons">support_agent</span>
+                Yêu cầu đặt tour
+              </button>
+              <a class="btn btn-outline" style="width:100%;margin-top:0.5rem;" routerLink="/contact">
+                <span class="material-icons">chat</span>
+                Tư vấn thêm
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+</div>
+<div class="loading-spinner" *ngIf="!tour"><div class="spinner"></div></div>

@@ -1,0 +1,93 @@
+<div class="settings-container">
+  <div class="settings-layout">
+    <!-- Thanh bên -->
+    <aside class="settings-sidebar">
+      <nav class="settings-nav">
+        <button 
+          *ngFor="let group of groups"
+          [class.active]="activeGroup === group.name"
+          (click)="setActiveGroup(group.name)"
+          class="nav-item">
+          <span class="material-icons">{{ group.icon }}</span>
+          <span>{{ group.label }}</span>
+        </button>
+      </nav>
+    </aside>
+
+    <!-- Nội dung -->
+    <main class="settings-content">
+      <div *ngIf="loading" class="loading">
+        <span class="material-icons spinning">refresh</span>
+        Đang tải...
+      </div>
+
+      <div *ngIf="!loading" class="settings-panel">
+        <!-- Phần đầu -->
+        <div class="panel-header">
+          <h2>{{ currentGroupLabel }}</h2>
+          <div class="panel-actions">
+            <button 
+              *ngIf="hasChanges" 
+              (click)="resetChanges()" 
+              class="btn btn-outline">
+              <span class="material-icons">undo</span>
+              Hoàn tác
+            </button>
+            <button 
+              [disabled]="!hasChanges || saving"
+              (click)="saveAll()" 
+              class="btn btn-primary">
+              <span class="material-icons" *ngIf="!saving">save</span>
+              <span class="material-icons spinning" *ngIf="saving">refresh</span>
+              {{ saving ? 'Đang lưu...' : 'Lưu thay đổi' }}
+            </button>
+          </div>
+        </div>
+
+        <!-- Tin nhắn -->
+        <div *ngIf="successMessage" class="alert alert-success">
+          <span class="material-icons">check_circle</span>
+          {{ successMessage }}
+        </div>
+        <div *ngIf="errorMessage" class="alert alert-error">
+          <span class="material-icons">error</span>
+          {{ errorMessage }}
+        </div>
+
+        <!-- Form cài đặt -->
+        <div class="settings-list">
+          <div *ngFor="let setting of currentGroupSettings" class="setting-item">
+            <div class="setting-label">
+              <label [for]="setting.key">{{ setting.label }}</label>
+              <span class="setting-key">{{ setting.key }}</span>
+            </div>
+            <div class="setting-control">
+              <textarea
+                *ngIf="isTextarea(setting.type)"
+                [id]="setting.key"
+                [value]="editValues[setting.key]"
+                (input)="updateValue(setting.key, $any($event.target).value)"
+                rows="3"
+                class="form-control"
+                [class.is-invalid]="fieldErrors[setting.key]"></textarea>
+              <input
+                *ngIf="!isTextarea(setting.type)"
+                [type]="setting.type === 'number' ? 'number' : 'text'"
+                [id]="setting.key"
+                [value]="editValues[setting.key]"
+                (input)="updateValue(setting.key, $any($event.target).value)"
+                class="form-control"
+                [class.is-invalid]="fieldErrors[setting.key]" />
+              <span class="field-error" *ngIf="fieldErrors[setting.key]">{{ fieldErrors[setting.key] }}</span>
+            </div>
+          </div>
+
+          <div *ngIf="currentGroupSettings.length === 0" class="empty-state">
+            <span class="material-icons">info</span>
+            <p>Không có cài đặt nào trong nhóm này</p>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+</div>

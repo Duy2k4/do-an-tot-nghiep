@@ -1,0 +1,40 @@
+.admin-toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+  gap: 1rem;
+}
+.toolbar-search {
+  position: relative;
+  flex: 1;
+  max-width: 360px;
+  .material-icons {
+    position: absolute;
+    left: 0.875rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--gray);
+    font-size: 1.125rem;
+  }
+  .form-control {
+    padding-left: 2.75rem;
+  }
+}
+
+.btn-sm .material-icons {
+  font-size: 1rem;
+}
+.rating {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  .score {
+    font-weight: 700;
+    font-size: 0.875rem;
+  }
+  .stars {
+    color: #f59e0b;
+    font-size: 0.875rem;
+  }
+}

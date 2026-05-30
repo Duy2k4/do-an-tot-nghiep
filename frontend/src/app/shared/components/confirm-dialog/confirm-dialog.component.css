@@ -1,0 +1,129 @@
+.confirm-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1200;
+  background: rgba(15, 23, 42, 0.55);
+  backdrop-filter: blur(4px);
+}
+
+.confirm-dialog {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  z-index: 1201;
+  width: 420px;
+  max-width: calc(100vw - 2rem);
+  transform: translate(-50%, -50%);
+  background: var(--white);
+  border-radius: 18px;
+  box-shadow: 0 25px 60px rgba(15, 23, 42, 0.24);
+  padding: 2rem;
+  text-align: center;
+}
+
+.confirm-close {
+  position: absolute;
+  top: 0.875rem;
+  right: 0.875rem;
+  width: 36px;
+  height: 36px;
+  border: 0;
+  border-radius: 50%;
+  background: #f1f5f9;
+  color: #64748b;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+}
+
+.confirm-close:hover {
+  background: #e2e8f0;
+  color: var(--dark);
+}
+
+.confirm-close .material-icons {
+  font-size: 1.25rem;
+}
+
+.confirm-icon {
+  width: 64px;
+  height: 64px;
+  margin: 0 auto 1.25rem;
+  border-radius: 50%;
+  background: #fee2e2;
+  color: #dc2626;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.confirm-icon .material-icons {
+  font-size: 2rem;
+}
+
+.confirm-dialog h3 {
+  margin: 0 0 0.75rem;
+  color: var(--dark);
+  font-size: 1.35rem;
+}
+
+.confirm-dialog p {
+  margin: 0;
+  color: var(--gray);
+  line-height: 1.6;
+}
+
+.confirm-actions {
+  display: flex;
+  justify-content: center;
+  gap: 0.75rem;
+  margin-top: 1.75rem;
+}
+
+.confirm-actions .btn {
+  min-width: 120px;
+  justify-content: center;
+}
+
+.confirm-actions .btn-outline {
+  border: 1px solid #e2e8f0;
+  color: #475569;
+  background: #ffffff;
+  box-shadow: none;
+}
+
+.confirm-actions .btn-outline:hover {
+  border-color: #cbd5e1;
+  color: #334155;
+  background: #f8fafc;
+}
+
+.confirm-actions .btn-danger {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  background: #dc2626;
+  border-color: #dc2626;
+  color: white;
+}
+
+.confirm-actions .btn-danger:hover {
+  background: #b91c1c;
+  border-color: #b91c1c;
+}
+
+@media (max-width: 480px) {
+  .confirm-dialog {
+    padding: 1.75rem 1.25rem;
+  }
+
+  .confirm-actions {
+    flex-direction: column-reverse;
+  }
+
+  .confirm-actions .btn {
+    width: 100%;
+  }
+}

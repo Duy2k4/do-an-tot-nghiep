@@ -1,0 +1,63 @@
+<div class="admin-layout">
+  <div class="admin-sidebar-overlay" [class.open]="isSidebarOpen" (click)="isSidebarOpen = false"></div>
+  <aside class="admin-sidebar" [class.open]="isSidebarOpen">
+    <div class="sidebar-header">
+      <span class="material-icons sidebar-icon">beach_access</span>
+      <div class="sidebar-brand">
+        <span class="brand-name">Admin Panel</span>
+        <span class="brand-sub">Du Lịch Quảng Bá</span>
+      </div>
+      <button class="sidebar-close" type="button" (click)="isSidebarOpen = false" aria-label="Đóng menu">
+        <span class="material-icons">close</span>
+      </button>
+    </div>
+    <ul class="sidebar-menu">
+      <li><a routerLink="/admin/dashboard" routerLinkActive="active"><span class="material-icons">dashboard</span> Dashboard</a></li>
+      <li><a routerLink="/admin/destinations" routerLinkActive="active"><span class="material-icons">place</span> Điểm đến</a></li>
+      <li><a routerLink="/admin/tours" routerLinkActive="active"><span class="material-icons">tour</span> Tour</a></li>
+      <li><a routerLink="/admin/articles" routerLinkActive="active"><span class="material-icons">article</span> Bài viết</a></li>
+      <li><a routerLink="/admin/categories" routerLinkActive="active"><span class="material-icons">category</span> Danh mục</a></li>
+      <li><a routerLink="/admin/users" routerLinkActive="active"><span class="material-icons">people</span> Người dùng</a></li>
+      <li><a routerLink="/admin/reviews" routerLinkActive="active"><span class="material-icons">star</span> Đánh giá</a></li>
+      <li><a routerLink="/admin/inquiries" routerLinkActive="active"><span class="material-icons">support_agent</span> Yêu cầu tư vấn</a></li>
+      <li class="sidebar-divider"></li>
+      <li><a routerLink="/admin/settings" routerLinkActive="active"><span class="material-icons">settings</span> Cài đặt</a></li>
+      <li class="sidebar-divider"></li>
+      <li><a routerLink="/" routerLinkActive="active"><span class="material-icons">home</span> Về website</a></li>
+      <li><a (click)="logout()" class="logout-link"><span class="material-icons">logout</span> Đăng xuất</a></li>
+    </ul>
+  </aside>
+  <div class="admin-main">
+    <header class="admin-header">
+      <div class="header-left">
+        <button class="admin-menu-btn" type="button" (click)="isSidebarOpen = true" aria-label="Mở menu">
+          <span class="material-icons">menu</span>
+        </button>
+        <div class="header-title-block">
+          <h1>{{ breadcrumbs[breadcrumbs.length - 1]?.label || 'Admin' }}</h1>
+          <nav class="breadcrumb" aria-label="breadcrumb">
+            <span class="breadcrumb-item" *ngFor="let crumb of breadcrumbs; let last = last">
+              <span [class.crumb-active]="last" [class.crumb-link]="!last">{{ crumb.label }}</span>
+              <span *ngIf="!last" class="breadcrumb-sep">
+                <span class="material-icons">chevron_right</span>
+              </span>
+            </span>
+          </nav>
+        </div>
+      </div>
+      <div class="header-actions">
+        <div class="header-date">
+          <span class="material-icons">today</span>
+          <span>{{ today | date:'dd/MM/yyyy' }}</span>
+        </div>
+        <div class="admin-avatar">
+          <span class="material-icons">account_circle</span>
+          <span>{{ auth.user()?.fullName }}</span>
+        </div>
+      </div>
+    </header>
+    <div class="admin-content">
+      <router-outlet></router-outlet>
+    </div>
+  </div>
+</div>

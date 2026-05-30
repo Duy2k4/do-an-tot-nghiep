@@ -1,0 +1,61 @@
+@startuml
+title Sequence - SD-007: Goi y dia diem thong minh
+
+skinparam monochrome true
+skinparam shadowing false
+skinparam defaultFontName Arial
+skinparam defaultFontSize 14
+skinparam sequence {
+  ArrowColor Black
+  LifeLineBorderColor Black
+  LifeLineBackgroundColor White
+  ParticipantBorderColor Black
+  ParticipantBackgroundColor White
+  ActorBorderColor Black
+  ActorBackgroundColor White
+  DatabaseBorderColor Black
+  DatabaseBackgroundColor White
+}
+
+actor "Nguoi dung" as User
+boundary "Trang Goi y" as UI
+control "Recommendation API\n/api/recommendations" as API
+control "DeepSeek API" as AI
+database "Co so du lieu" as DB
+
+autonumber 1
+
+User -> UI: Truy cap trang
+User -> UI: Chon tieu chi (vung mien, loai hinh, ngan sach)
+User -> UI: Nhan "Goi y cho toi"
+
+UI -> UI: Tao preferences\n(regions, categories, budget)
+UI -> API: POST preferences\n+ token neu dang nhap
+
+API -> API: Validate request\nLay userId, tao sessionId
+API -> DB: Query 30 dia diem dang hoat dong\nkem province, category, tags
+DB --> API: Tra ve destination context
+
+API -> API: Tao prefSummary\nva prompt goi y
+API -> AI: Gui system prompt + user message
+AI -> AI: Phan tich so thich\nva chon 5-8 dia diem phu hop
+AI --> API: Tra ve JSON\n(id, name, reason, matchScore, summary)
+
+API -> API: Parse ket qua AI
+
+loop Moi dia diem duoc AI chon
+  API -> DB: Query chi tiet dia diem\nkem anh chinh, category, province
+  DB --> API: Tra ve destination day du
+end
+
+API -> DB: Luu recommendation log\n(userId, sessionId, preferences, results)
+DB --> API: Xac nhan luu
+
+API --> UI: Tra ve recommendations\n+ summary + total + algorithm
+UI -> UI: Chuan hoa matchScore va aiReason
+UI --> User: Hien thi danh sach goi y\nkem diem, ly do, anh, thong tin tom tat
+
+User -> UI: Bam vao mot dia diem
+UI --> User: Chuyen sang trang chi tiet\n/destinations/{slug}
+
+@enduml

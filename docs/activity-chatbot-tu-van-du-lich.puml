@@ -1,0 +1,46 @@
+@startuml
+title Activity - Su dung chatbot tu van du lich
+
+skinparam monochrome true
+skinparam shadowing false
+skinparam defaultFontName Arial
+skinparam defaultFontSize 14
+skinparam activity {
+  BorderColor Black
+  BackgroundColor White
+  ArrowColor Black
+  DiamondBorderColor Black
+  DiamondBackgroundColor White
+  StartColor Black
+  EndColor Black
+}
+
+|User|
+start
+:Mo chatbot;
+:Nhap cau hoi hoac chon goi y nhanh;
+
+|System|
+:Nhan message + sessionId;
+:Validate va luu tin nhan user;
+:Lay Knowledge Base\n(dia diem, tour, bai viet);
+:Gui prompt toi DeepSeek API;
+:Nhan reply va lay card dia diem lien quan;
+:Luu tin nhan assistant;
+:Tra ve reply + cards;
+
+|User|
+:Nhan cau tra loi;
+if (Tiep tuc hoi nua?) then (Co)
+  :Gui cau hoi tiep;
+  |System|
+  :Xu ly va tra loi tiep;
+  |User|
+  :Nhan cau tra loi;
+else (Khong)
+endif
+
+:Dong chatbot;
+stop
+
+@enduml

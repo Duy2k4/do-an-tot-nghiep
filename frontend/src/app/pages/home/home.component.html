@@ -1,0 +1,312 @@
+<!-- Khu hero -->
+<section class="hero">
+  <div class="hero-bg"></div>
+  <div class="container">
+    <div class="hero-content">
+      <h1>Khám Phá Việt Nam<br>Cùng Chúng Tôi</h1>
+      <p>Hệ thống gợi ý du lịch thông minh, tìm kiếm điểm đến hoàn hảo cho chuyến đi của bạn.</p>
+      <div class="hero-actions">
+        <a routerLink="/destinations" class="btn btn-primary btn-lg">Khám phá ngay</a>
+        <a routerLink="/recommendations" class="btn btn-white btn-lg">
+          <span class="material-icons" style="font-size:14px;margin-bottom: 00;">auto_awesome</span>
+          Bắt đầu gợi ý
+        </a>
+      </div>
+    </div>
+  </div>
+  <div class="hero-scroll-indicator">
+    <span class="material-icons">keyboard_arrow_down</span>
+    <span>Cuộn xuống</span>
+  </div>
+</section>
+
+<!-- Khu tìm kiếm -->
+<section class="container" style="position:relative;z-index:10;">
+  <div class="search-box">
+    <div class="search-form">
+      <div class="search-input-wrap">
+        <span class="material-icons search-icon">search</span>
+        <input type="text" [(ngModel)]="searchKeyword" placeholder="Tìm kiếm địa điểm...">
+      </div>
+      <div class="chip-group">
+        <span class="material-icons chip-icon">category</span>
+        <select class="chip-select" [(ngModel)]="searchCategory">
+          <option value="">Tất cả loại hình</option>
+          <option value="bien-dao">Biển & Đảo</option>
+          <option value="nui-rung">Núi & Rừng</option>
+          <option value="di-san">Di Sản</option>
+          <option value="le-hoi">Lễ Hội</option>
+          <option value="thien-nhien">Thiên Nhiên</option>
+          <option value="thanh-pho">Thành Phố</option>
+        </select>
+      </div>
+      <button class="btn btn-primary btn-search" (click)="search()">
+        <span class="material-icons">search</span> Tìm kiếm
+      </button>
+    </div>
+  </div>
+</section>
+
+<!-- Banner thống kê -->
+<section class="stats-banner deco-dots">
+  <div class="container">
+    <div class="grid grid-4">
+      <div class="stat-item">
+        <span class="material-icons">place</span>
+        <div>
+          <strong>30+</strong>
+          <p>Điểm đến</p>
+        </div>
+      </div>
+      <div class="stat-item">
+        <span class="material-icons">tour</span>
+        <div>
+          <strong>15+</strong>
+          <p>Tour du lịch</p>
+        </div>
+      </div>
+      <div class="stat-item">
+        <span class="material-icons">article</span>
+        <div>
+          <strong>20+</strong>
+          <p>Bài viết</p>
+        </div>
+      </div>
+      <div class="stat-item">
+        <span class="material-icons">people</span>
+        <div>
+          <strong>5000+</strong>
+          <p>Du khách</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Điểm đến nổi bật -->
+<section class="section">
+  <div class="container">
+    <div class="section-header">
+      <h2>Điểm Đến Nổi Bật</h2>
+      <p>Khám phá những địa điểm du lịch đẹp nhất Việt Nam được yêu thích nhất</p>
+    </div>
+    <div class="loading-spinner" *ngIf="loadingDestinations">
+      <div class="spinner"></div>
+    </div>
+    <div class="grid grid-4" *ngIf="!loadingDestinations">
+      <a *ngFor="let d of featuredDestinations" [routerLink]="['/destinations', d.slug]" class="card dest-card-home fade-in">
+        <div class="card-image" style="height:220px;">
+          <img [src]="d.images[0]?.url || 'https://picsum.photos/seed/' + d.slug + '/400/300'" [alt]="d.name">
+          <div class="card-img-overlay">
+            <span class="overlay-text"><span class="material-icons">explore</span> Khám phá</span>
+          </div>
+          <span class="badge badge-warning card-badge-top" *ngIf="d.isFeatured">Nổi bật</span>
+          <span class="view-count-badge">
+            <span class="material-icons">visibility</span> {{ d.viewCount | number }}
+          </span>
+        </div>
+        <div class="card-body">
+          <div class="card-category-pill">{{ d.category?.name }}</div>
+          <h3 class="card-title">{{ d.name }}</h3>
+          <p class="card-location">
+            <span class="material-icons">location_on</span>
+            {{ d.province?.name }}
+          </p>
+          <div class="card-footer">
+            <div class="rating">
+              <span class="score">{{ d.rating }}</span>
+              <span class="material-icons stars">star</span>
+              <span class="count">({{ d.reviewCount }} đánh giá)</span>
+            </div>
+          </div>
+        </div>
+      </a>
+    </div>
+    <div class="text-center mt-4">
+      <a routerLink="/destinations" class="btn btn-outline btn-lg btn-view-all">
+        Xem tất cả điểm đến
+        <span class="material-icons">chevron_right</span>
+      </a>
+    </div>
+  </div>
+</section>
+
+
+
+<!-- Tour nổi bật -->
+<section class="section section-alt stats-banner deco-dots">
+  <div class="container">
+    <div class="section-header">
+      <h2>Tour Du Lịch Hot</h2>
+      <p>Những tour được đặt nhiều nhất, lịch trình hấp dẫn, giá cả hợp lý</p>
+    </div>
+    <div class="loading-spinner" *ngIf="loadingTours">
+      <div class="spinner"></div>
+    </div>
+    <div class="grid grid-3" *ngIf="!loadingTours">
+      <div *ngFor="let t of featuredTours" class="card tour-card-home fade-in">
+        <div class="card-image" style="height:200px;">
+          <img [src]="t.images?.[0]?.url ? api.mediaUrl(t.images[0].url) : (t.imageUrl ? api.mediaUrl(t.imageUrl) : 'https://picsum.photos/seed/' + t.slug + '/400/300')" [alt]="t.name">
+          <div class="card-img-overlay">
+            <span class="overlay-text"><span class="material-icons">explore</span> Xem chi tiết</span>
+          </div>
+          <span class="badge badge-primary card-badge-top" *ngIf="t.discountPrice">{{ getDiscount(t) }}% OFF</span>
+          <span class="badge badge-warning card-badge-top-left" *ngIf="t.isFeatured">Hot</span>
+          <span class="duration-badge">
+            <span class="material-icons">schedule</span> {{ t.duration }}
+          </span>
+        </div>
+        <div class="card-body">
+          <h3 class="card-title">{{ t.name }}</h3>
+          <p class="card-duration">
+            <span class="material-icons">people</span>
+            Tối đa {{ t.maxPeople }} người
+          </p>
+          <div class="tour-pricing">
+            <span class="price-old" *ngIf="t.discountPrice">{{ t.price | number:'1.0-0' }}đ</span>
+            <span class="price">{{ (t.discountPrice || t.price) | number:'1.0-0' }}đ</span>
+            <span class="per-person">/người</span>
+          </div>
+          <div class="card-actions">
+            <a [routerLink]="['/tours', t.slug]" class="btn btn-primary">Chi tiết</a>
+            <button class="btn btn-outline" (click)="requestTour(t)">Tư vấn</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="text-center mt-4">
+      <a routerLink="/tours" class="btn btn-outline btn-lg btn-view-all">
+        Xem tất cả tour
+        <span class="material-icons">chevron_right</span>
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- Bài viết gần đây -->
+<section class="section section-alt stats-banner deco-dots">
+  <div class="container">
+    <div class="section-header">
+      <h2>Cẩm Nang Du Lịch</h2>
+      <p>Kinh nghiệm, mẹo hay và lịch trình từ những người đã đi</p>
+    </div>
+    <div class="loading-spinner" *ngIf="loadingArticles">
+      <div class="spinner"></div>
+    </div>
+    <div class="grid grid-3" *ngIf="!loadingArticles">
+      <a *ngFor="let a of recentArticles" [routerLink]="['/articles', a.slug]" class="card article-card-home fade-in">
+        <div class="card-image" style="height:200px;">
+          <img [src]="a.imageUrl || 'https://picsum.photos/seed/' + a.slug + '/400/250'" [alt]="a.title">
+          <div class="card-img-overlay">
+            <span class="overlay-text"><span class="material-icons">menu_book</span> Đọc ngay</span>
+          </div>
+          <span class="badge badge-primary card-badge-top">{{ a.category?.name }}</span>
+        </div>
+        <div class="card-body">
+          <h3 class="card-title">{{ a.title }}</h3>
+          <p class="card-excerpt">{{ a.excerpt }}</p>
+          <div class="card-meta">
+            <span class="material-icons">visibility</span> {{ a.viewCount | number }}
+            <span class="material-icons" style="margin-left:0.75rem;">calendar_today</span> {{ a.publishedAt | date:'dd/MM/yyyy' }}
+          </div>
+        </div>
+      </a>
+    </div>
+    <div class="text-center mt-4">
+      <a routerLink="/articles" class="btn btn-outline btn-lg btn-view-all">
+        Xem tất cả bài viết
+        <span class="material-icons">chevron_right</span>
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- Lời kêu gọi gợi ý AI -->
+<section class="ai-cta">
+  <div class="container">
+    <div class="ai-cta-card">
+      <div class="ai-cta-left">
+        <div class="ai-badge">
+          <span class="material-icons">auto_awesome</span>
+          <span>Powered by AI</span>
+        </div>
+        <h2>Khám phá điểm đến<br>phù hợp với <span>chính bạn</span></h2>
+        <p>Trả lời vài câu hỏi đơn giản, AI sẽ phân tích và gợi ý những địa điểm du lịch phù hợp nhất với sở thích của bạn.</p>
+        <div class="ai-features">
+          <div class="ai-feat">
+            <span class="material-icons">psychology</span>
+            <span>Phân tích thông minh</span>
+          </div>
+          <div class="ai-feat">
+            <span class="material-icons">bolt</span>
+            <span>Kết quả tức thì</span>
+          </div>
+          <div class="ai-feat">
+            <span class="material-icons">stars</span>
+            <span>Cá nhân hóa cao</span>
+          </div>
+        </div>
+        <a routerLink="/recommendations" class="btn btn-white btn-lg ai-btn">
+          <span class="material-icons">auto_awesome</span>
+          Bắt đầu gợi ý ngay
+        </a>
+      </div>
+      <div class="ai-cta-right">
+        <div class="ai-illustration">
+          <span class="material-icons ai-big-icon">travel_explore</span>
+          <div class="ai-pulse"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Liên hệ nhanh -->
+<section class="section">
+  <div class="container">
+    <div class="quick-contact">
+      <div class="contact-info">
+        <h2>Liên Hệ Ngay</h2>
+        <p class="lead">Bạn cần tư vấn về tour du lịch? Để lại thông tin, chúng tôi sẽ liên hệ lại ngay!</p>
+        <div class="contact-features">
+          <div class="contact-feature">
+            <span class="material-icons">support_agent</span>
+            <span>Tư vấn 24/7</span>
+          </div>
+          <div class="contact-feature">
+            <span class="material-icons">verified</span>
+            <span>Hướng dẫn viên chuyên nghiệp</span>
+          </div>
+          <div class="contact-feature">
+            <span class="material-icons">local_offer</span>
+            <span>Ưu đãi hấp dẫn</span>
+          </div>
+        </div>
+      </div>
+      <div class="contact-form">
+        <div class="grid grid-2">
+          <div>
+            <input type="text" class="form-control" [(ngModel)]="contactName" placeholder="Họ tên của bạn" [class.is-invalid]="contactErrors.name">
+            <span class="field-error" *ngIf="contactErrors.name">{{ contactErrors.name }}</span>
+          </div>
+          <div>
+            <input type="email" class="form-control" [(ngModel)]="contactEmail" placeholder="Email của bạn" [class.is-invalid]="contactErrors.email">
+            <span class="field-error" *ngIf="contactErrors.email">{{ contactErrors.email }}</span>
+          </div>
+        </div>
+        <div>
+          <textarea class="form-control" [(ngModel)]="contactMessage" placeholder="Bạn cần tư vấn về..." [class.is-invalid]="contactErrors.message"></textarea>
+          <span class="field-error" *ngIf="contactErrors.message">{{ contactErrors.message }}</span>
+        </div>
+        <button class="btn btn-primary btn-lg" (click)="submitQuickContact()">
+          <span class="material-icons">send</span>
+          Gửi yêu cầu
+        </button>
+        <p class="contact-success" *ngIf="contactSuccess">
+          <span class="material-icons" style="font-size:1rem;vertical-align:middle;">check_circle</span>
+          Gửi thành công! Chúng tôi sẽ liên hệ sớm.
+        </p>
+      </div>
+    </div>
+  </div>
+</section>

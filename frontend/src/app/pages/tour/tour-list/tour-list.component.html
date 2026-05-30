@@ -1,0 +1,65 @@
+<div class="page-header ph-tours">
+  <div class="container">
+    <h1>Tour Du Lịch</h1>
+    <p>Chọn tour phù hợp, lên kế hoạch cho chuyến đi hoàn hảo</p>
+  </div>
+</div>
+<section class="section">
+  <div class="container">
+    <div class="filters-bar">
+      <div class="filter-search">
+        <span class="material-icons">search</span>
+        <input type="text" [(ngModel)]="search" (ngModelChange)="loadTours()" placeholder="Tìm kiếm tour..." class="search-input">
+      </div>
+      <div class="filter-chips">
+        <div class="chip-group">
+          <span class="material-icons chip-icon">sort</span>
+          <select class="chip-select" [(ngModel)]="sort" (change)="loadTours()">
+            <option value="createdAt">Mới nhất</option>
+            <option value="price">Giá: Thấp đến cao</option>
+          </select>
+        </div>
+      </div>
+    </div>
+    <div class="loading-spinner" *ngIf="loading"><div class="spinner"></div></div>
+    <div class="grid grid-3" *ngIf="!loading">
+      <div *ngFor="let t of tours" class="card tour-card fade-in">
+        <div class="card-image" style="height:200px;">
+          <img [src]="t.images?.[0]?.url ? api.mediaUrl(t.images[0].url) : (t.imageUrl ? api.mediaUrl(t.imageUrl) : 'https://picsum.photos/seed/' + t.slug + '/400/250')" [alt]="t.name">
+          <div class="card-img-overlay">
+            <span class="overlay-text"><span class="material-icons">explore</span> Xem chi tiết</span>
+          </div>
+          <span class="badge badge-primary card-badge-top" *ngIf="t.discountPrice">{{ getDiscount(t) }}% OFF</span>
+          <span class="badge badge-warning card-badge-top-left" *ngIf="t.isFeatured">Hot</span>
+          <span class="duration-badge">
+            <span class="material-icons">schedule</span> {{ t.duration }}
+          </span>
+        </div>
+        <div class="card-body">
+          <h3 class="card-title">{{ t.name }}</h3>
+          <p class="duration">
+            <span class="material-icons">people</span>
+            Tối đa {{ t.maxPeople }} người
+          </p>
+          <p class="desc">{{ t.shortDescription }}</p>
+          <div class="pricing">
+            <span class="old" *ngIf="t.discountPrice">{{ t.price | number:'1.0-0' }}đ</span>
+            <span class="current">{{ (t.discountPrice || t.price) | number:'1.0-0' }}đ</span>
+            <span class="per">/người</span>
+          </div>
+          <div class="card-actions">
+            <a [routerLink]="['/tours', t.slug]" class="btn btn-primary">Chi tiết</a>
+            <button class="btn btn-outline" routerLink="/contact">Tư vấn</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="empty-state" *ngIf="!loading && tours.length === 0">
+      <span class="material-icons">search_off</span>
+      <h3>Không tìm thấy tour nào</h3>
+    </div>
+    <div class="pagination" *ngIf="!loading && pagination.totalPages > 1">
+      <button *ngFor="let p of pageNumbers" [class.active]="p === pagination.page" (click)="goToPage(p)">{{ p }}</button>
+    </div>
+  </div>
+</section>

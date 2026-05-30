@@ -1,0 +1,89 @@
+<nav class="navbar" [class.scrolled]="scrolled">
+  <div class="container navbar-content">
+    <a routerLink="/" class="navbar-brand">
+      <span class="material-icons">beach_access</span>
+      Du Lịch Việt
+    </a>
+
+    <ul class="navbar-menu">
+      <li><a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{exact:true}">Trang chủ</a></li>
+      <li><a routerLink="/destinations" routerLinkActive="active">Điểm đến</a></li>
+      <li><a routerLink="/tours" routerLinkActive="active">Tour</a></li>
+      <li><a routerLink="/articles" routerLinkActive="active">Cẩm nang</a></li>
+      <li><a routerLink="/recommendations" routerLinkActive="active">Gợi ý</a></li>
+      <li><a routerLink="/contact" routerLinkActive="active">Liên hệ</a></li>
+    </ul>
+
+    <div class="navbar-actions">
+      <ng-container *ngIf="auth.isLoggedIn(); else loginBtn">
+        <div class="user-dropdown">
+          <button class="user-btn" (click)="dropdownOpen = !dropdownOpen; mobileMenuOpen = false" aria-label="Mở menu tài khoản">
+            <div class="user-avatar"><span class="material-icons">person</span></div>
+          </button>
+          <div class="dropdown-menu" *ngIf="dropdownOpen">
+            <div class="dropdown-user">
+              <div class="dropdown-user-avatar"><span class="material-icons">person</span></div>
+              <div class="dropdown-user-info">
+                <span class="dropdown-user-name">{{ auth.user()?.fullName }}</span>
+              </div>
+            </div>
+            <div class="dropdown-divider"></div>
+            <a routerLink="/user/profile" (click)="dropdownOpen = false"><span class="material-icons">account_circle</span> Hồ sơ</a>
+            <a routerLink="/user/favorites" (click)="dropdownOpen = false"><span class="material-icons">favorite</span> Yêu thích</a>
+            <a routerLink="/user/inquiries" (click)="dropdownOpen = false"><span class="material-icons">send</span> Yêu cầu</a>
+            <a routerLink="/admin" *ngIf="auth.isAdmin()" (click)="dropdownOpen = false"><span class="material-icons">admin_panel_settings</span> Quản trị</a>
+            <div class="dropdown-divider"></div>
+            <a (click)="auth.logout(); dropdownOpen = false"><span class="material-icons">logout</span> Đăng xuất</a>
+          </div>
+        </div>
+      </ng-container>
+
+      <ng-template #loginBtn>
+        <a class="btn btn-outline btn-sm" (click)="openLogin()">Đăng nhập</a>
+        <a class="btn btn-primary btn-sm" (click)="openRegister()">Đăng ký</a>
+      </ng-template>
+    </div>
+
+    <button
+      class="mobile-menu-btn"
+      (click)="mobileMenuOpen = !mobileMenuOpen; dropdownOpen = false"
+      [attr.aria-expanded]="mobileMenuOpen"
+      aria-label="Mở menu điều hướng">
+      <span class="material-icons">{{ mobileMenuOpen ? 'close' : 'menu' }}</span>
+    </button>
+  </div>
+
+  <div class="mobile-menu" [class.open]="mobileMenuOpen">
+    <ul>
+      <li><a routerLink="/" (click)="mobileMenuOpen = false"><span class="material-icons">home</span> Trang chủ</a></li>
+      <li><a routerLink="/destinations" (click)="mobileMenuOpen = false"><span class="material-icons">place</span> Điểm đến</a></li>
+      <li><a routerLink="/tours" (click)="mobileMenuOpen = false"><span class="material-icons">tour</span> Tour</a></li>
+      <li><a routerLink="/articles" (click)="mobileMenuOpen = false"><span class="material-icons">article</span> Cẩm nang</a></li>
+      <li><a routerLink="/recommendations" (click)="mobileMenuOpen = false"><span class="material-icons">auto_awesome</span> Gợi ý AI</a></li>
+      <li><a routerLink="/contact" (click)="mobileMenuOpen = false"><span class="material-icons">mail</span> Liên hệ</a></li>
+    </ul>
+    <div class="mobile-auth" *ngIf="!auth.isLoggedIn()">
+      <a class="btn btn-outline" (click)="mobileMenuOpen = false; openLogin()">Đăng nhập</a>
+      <a class="btn btn-primary" (click)="mobileMenuOpen = false; openRegister()">Đăng ký</a>
+    </div>
+    <div class="mobile-user" *ngIf="auth.isLoggedIn()">
+      <div class="mobile-user-head">
+        <div class="mobile-user-avatar"><span class="material-icons">person</span></div>
+        <div>
+          <p>{{ auth.user()?.fullName }}</p>
+          <span>Tài khoản của bạn</span>
+        </div>
+      </div>
+      <div class="mobile-user-links">
+        <a routerLink="/user/profile" (click)="mobileMenuOpen = false"><span class="material-icons">account_circle</span> Hồ sơ</a>
+        <a routerLink="/user/favorites" (click)="mobileMenuOpen = false"><span class="material-icons">favorite</span> Yêu thích</a>
+        <a routerLink="/user/inquiries" (click)="mobileMenuOpen = false"><span class="material-icons">send</span> Yêu cầu</a>
+        <a *ngIf="auth.isAdmin()" routerLink="/admin" (click)="mobileMenuOpen = false"><span class="material-icons">admin_panel_settings</span> Quản trị</a>
+      </div>
+      <button class="btn btn-outline" (click)="auth.logout(); mobileMenuOpen = false">
+        <span class="material-icons">logout</span>
+        Đăng xuất
+      </button>
+    </div>
+  </div>
+</nav>

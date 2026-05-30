@@ -1,0 +1,335 @@
+<section class="section">
+  <div class="container container-sm">
+    <div class="card">
+      <div class="card-body">
+        <form (ngSubmit)="save()">
+          <div class="form-group">
+            <label>Tên <span class="text-danger">*</span></label
+            ><input
+              type="text"
+              class="form-control"
+              [(ngModel)]="form.name"
+              (ngModelChange)="onNameChange($event)"
+              name="name"
+              required
+              [class.is-invalid]="fieldErrors['name']"
+            />
+            <span class="field-error" *ngIf="fieldErrors['name']">{{ fieldErrors['name'] }}</span>
+          </div>
+          <div class="form-group">
+            <label>Slug <span class="text-danger">*</span></label
+            ><input
+              type="text"
+              class="form-control"
+              [(ngModel)]="form.slug"
+              (ngModelChange)="onSlugChange($event)"
+              name="slug"
+              placeholder="Tự động tạo từ tên điểm đến"
+              required
+              [class.is-invalid]="fieldErrors['slug']"
+            />
+            <span class="field-error" *ngIf="fieldErrors['slug']">{{ fieldErrors['slug'] }}</span>
+          </div>
+          <div class="grid grid-2">
+            <div class="form-group">
+              <label>Tỉnh/Thành <span class="text-danger">*</span></label
+              ><select
+                class="form-control"
+                [(ngModel)]="form.provinceId"
+                name="provinceId"
+                required
+                [class.is-invalid]="fieldErrors['provinceId']"
+              >
+                <option value="">{{ provinceLoading ? 'Đang tải tỉnh/thành...' : 'Chọn tỉnh/thành' }}</option>
+                <option *ngFor="let p of provinces" [value]="p.id">
+                  {{ p.displayName || p.name }}
+                </option>
+              </select>
+              <span class="field-error" *ngIf="fieldErrors['provinceId']">{{ fieldErrors['provinceId'] }}</span>
+            </div>
+            <div class="form-group">
+              <label>Danh mục <span class="text-danger">*</span></label
+              ><select
+                class="form-control"
+                [(ngModel)]="form.categoryId"
+                name="categoryId"
+                required
+                [class.is-invalid]="fieldErrors['categoryId']"
+              >
+                <option value="">Chọn danh mục</option>
+                <option *ngFor="let c of categories" [value]="c.id">
+                  {{ c.name }}
+                </option>
+              </select>
+              <span class="field-error" *ngIf="fieldErrors['categoryId']">{{ fieldErrors['categoryId'] }}</span>
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Địa chỉ <span class="text-danger">*</span></label
+            ><input
+              type="text"
+              class="form-control"
+              [(ngModel)]="form.address"
+              name="address"
+              required
+              [class.is-invalid]="fieldErrors['address']"
+            />
+            <span class="field-error" *ngIf="fieldErrors['address']">{{ fieldErrors['address'] }}</span>
+          </div>
+          <div class="form-group">
+            <label>Mô tả ngắn</label
+            ><input
+              type="text"
+              class="form-control"
+              [(ngModel)]="form.shortDescription"
+              name="shortDescription"
+            />
+          </div>
+          <div class="form-group">
+            <label>Mô tả chi tiết <span class="text-danger">*</span></label
+            ><textarea
+              class="form-control"
+              [(ngModel)]="form.description"
+              name="description"
+              rows="5"
+              required
+              [class.is-invalid]="fieldErrors['description']"
+            ></textarea>
+            <span class="field-error" *ngIf="fieldErrors['description']">{{ fieldErrors['description'] }}</span>
+          </div>
+          <div class="grid grid-2">
+            <div class="form-group">
+              <label>Thời gian đẹp nhất</label
+              ><input
+                type="text"
+                class="form-control"
+                [(ngModel)]="form.bestTime"
+                name="bestTime"
+                placeholder="VD: Tháng 3-5"
+              />
+            </div>
+            <div class="form-group">
+              <label>Chi phí ước tính</label
+              ><input
+                type="text"
+                class="form-control"
+                [(ngModel)]="form.estimatedCost"
+                name="estimatedCost"
+                placeholder="VD: 500.000 - 1.000.000đ"
+              />
+            </div>
+          </div>
+
+          <!-- Khu vực tải ảnh -->
+          <div class="form-group">
+            <label>Hình ảnh điểm đến</label>
+            <div class="upload-area" (click)="fileInput.click()">
+              <input
+                #fileInput
+                type="file"
+                multiple
+                accept="image/*"
+                (change)="onFileSelect($event)"
+                style="display: none"
+              />
+              <div class="upload-placeholder">
+                <span class="material-icons">cloud_upload</span>
+                <p>Click để chọn nhiều hình ảnh</p>
+                <small>Hỗ trợ: JPG, PNG, GIF, WebP (tối đa 5MB mỗi ảnh)</small>
+              </div>
+            </div>
+
+            <div class="image-preview-grid" *ngIf="images.length > 0">
+              <div
+                class="image-preview-item"
+                *ngFor="let img of images; let i = index"
+              >
+                <img [src]="img.preview || api.mediaUrl(img.url)" alt="Preview" />
+                <div class="image-actions">
+                  <button
+                    type="button"
+                    class="btn-icon"
+                    (click)="setPrimary(i)"
+                    [class.primary]="i === 0"
+                    title="Đặt làm ảnh chính"
+                  >
+                    <span class="material-icons">star</span>
+                  </button>
+                  <button
+                    type="button"
+                    class="btn-icon delete"
+                    (click)="removeImage(i)"
+                    title="Xóa"
+                  >
+                    <span class="material-icons">delete</span>
+                  </button>
+                </div>
+                <span class="primary-badge" *ngIf="i === 0">Ảnh chính</span>
+                <div class="caption-input">
+                  <input
+                    type="text"
+                    [(ngModel)]="img.caption"
+                    [name]="'caption_' + i"
+                    placeholder="Mô tả ảnh..."
+                    class="form-control form-control-sm"
+                  />
+                </div>
+              </div>
+            </div>
+
+            <div class="no-images" *ngIf="images.length === 0">
+              <small class="text-muted"
+                >Chưa có hình ảnh nào. Click bên trên để tải lên.</small
+              >
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>Mẹo du lịch</label
+            ><textarea
+              class="form-control"
+              [(ngModel)]="form.tips"
+              name="tips"
+              rows="3"
+            ></textarea>
+          </div>
+          <div class="form-group">
+            <label
+              ><input type="checkbox" [(ngModel)]="form.isFeatured" name="isFeatured" /> Đánh dấu
+              nổi bật</label
+            >
+          </div>
+          <div class="form-group">
+            <label
+              ><input type="checkbox" [(ngModel)]="form.isActive" name="isActive" /> Hoạt
+              động</label
+            >
+          </div>
+          <div class="form-error" *ngIf="error">{{ error }}</div>
+          <div style="display: flex; gap: 0.75rem">
+            <button
+              type="submit"
+              class="btn btn-primary"
+              [disabled]="loading || uploading"
+            >
+              {{
+                uploading ? "Đang tải ảnh..." : loading ? "Đang lưu..." : "Lưu"
+              }}
+            </button>
+            <a routerLink="/admin/destinations" class="btn btn-outline">Hủy</a>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .upload-area {
+    border: 2px dashed #ccc;
+    border-radius: 8px;
+    padding: 2rem;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.3s;
+    background: #fafafa;
+  }
+  .upload-area:hover {
+    border-color: var(--primary);
+    background: #f0f7ff;
+  }
+  .upload-placeholder .material-icons {
+    font-size: 48px;
+    color: #aaa;
+  }
+  .upload-placeholder p {
+    margin: 0.5rem 0;
+    color: #666;
+    font-weight: 500;
+  }
+  .upload-placeholder small {
+    color: #999;
+  }
+
+  .image-preview-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 1rem;
+    margin-top: 1rem;
+  }
+  .image-preview-item {
+    position: relative;
+    border-radius: 8px;
+    overflow: hidden;
+    background: #f5f5f5;
+    border: 2px solid transparent;
+  }
+  .image-preview-item:first-child {
+    border-color: var(--primary);
+  }
+  .image-preview-item img {
+    width: 100%;
+    height: 120px;
+    object-fit: cover;
+  }
+  .image-actions {
+    position: absolute;
+    top: 4px;
+    right: 4px;
+    display: flex;
+    gap: 4px;
+    opacity: 0;
+    transition: opacity 0.2s;
+  }
+  .image-preview-item:hover .image-actions {
+    opacity: 1;
+  }
+  .btn-icon {
+    width: 28px;
+    height: 28px;
+    border: none;
+    border-radius: 50%;
+    background: rgba(0, 0, 0, 0.6);
+    color: white;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+  }
+  .btn-icon .material-icons {
+    font-size: 16px;
+  }
+  .btn-icon:hover {
+    background: rgba(0, 0, 0, 0.8);
+  }
+  .btn-icon.primary {
+    background: var(--primary);
+  }
+  .btn-icon.delete:hover {
+    background: #dc3545;
+  }
+  .primary-badge {
+    position: absolute;
+    top: 4px;
+    left: 4px;
+    background: var(--primary);
+    color: white;
+    font-size: 10px;
+    padding: 2px 6px;
+    border-radius: 4px;
+  }
+  .caption-input {
+    padding: 4px;
+  }
+  .form-control-sm {
+    padding: 4px 8px;
+    font-size: 12px;
+  }
+  .no-images {
+    margin-top: 0.5rem;
+  }
+  .text-muted {
+    color: #6c757d;
+  }
+</style>

@@ -1,0 +1,88 @@
+<div *ngIf="stats" class="fade-in">
+  <h2 style="margin-bottom:1.5rem;">Dashboard</h2>
+
+  <!-- Hàng thống kê -->
+  <div class="stats-row" style="margin-bottom:2rem;">
+    <div class="stat-card stat-sm">
+      <div class="stat-icon icon-primary"><span class="material-icons">place</span></div>
+      <div class="stat-value">{{ stats.destinations }}</div>
+      <div class="stat-label">Điểm đến</div>
+    </div>
+    <div class="stat-card stat-sm">
+      <div class="stat-icon icon-success"><span class="material-icons">tour</span></div>
+      <div class="stat-value">{{ stats.tours }}</div>
+      <div class="stat-label">Tours</div>
+    </div>
+    <div class="stat-card stat-sm">
+      <div class="stat-icon icon-warning"><span class="material-icons">article</span></div>
+      <div class="stat-value">{{ stats.articles }}</div>
+      <div class="stat-label">Bài viết</div>
+    </div>
+    <div class="stat-card stat-sm">
+      <div class="stat-icon icon-danger"><span class="material-icons">people</span></div>
+      <div class="stat-value">{{ stats.users }}</div>
+      <div class="stat-label">Người dùng</div>
+    </div>
+    <div class="stat-card stat-sm">
+      <div class="stat-icon icon-success"><span class="material-icons">star</span></div>
+      <div class="stat-value">{{ stats.reviews }}</div>
+      <div class="stat-label">Đánh giá</div>
+    </div>
+    <div class="stat-card stat-sm">
+      <div class="stat-icon icon-warning"><span class="material-icons">pending</span></div>
+      <div class="stat-value">{{ stats.pendingInquiries }}</div>
+      <div class="stat-label">Yêu cầu chờ</div>
+    </div>
+    <div class="stat-card stat-sm">
+      <div class="stat-icon icon-primary"><span class="material-icons">check_circle</span></div>
+      <div class="stat-value">{{ stats.activeUsers }}</div>
+      <div class="stat-label">User hoạt động</div>
+    </div>
+  </div>
+
+  <!-- Hàng biểu đồ -->
+  <div class="grid grid-2" style="margin-bottom:2rem;">
+    <div class="card chart-card">
+      <highcharts-chart
+        [Highcharts]="Highcharts"
+        [options]="lineChartOptions"
+        [update]="lineChartUpdateFlag"
+        style="width:100%;display:block;">
+      </highcharts-chart>
+    </div>
+    <div class="card chart-card">
+      <highcharts-chart
+        [Highcharts]="Highcharts"
+        [options]="columnChartOptions"
+        [update]="columnChartUpdateFlag"
+        style="width:100%;display:block;">
+      </highcharts-chart>
+    </div>
+  </div>
+
+  <!-- Hàng dưới -->
+  <div class="grid grid-2" style="margin-bottom:2rem;">
+    <div class="card chart-card">
+      <highcharts-chart
+        [Highcharts]="Highcharts"
+        [options]="pieChartOptions"
+        [update]="pieChartUpdateFlag"
+        style="width:100%;display:block;">
+      </highcharts-chart>
+    </div>
+    <div class="card">
+      <div class="card-body">
+        <h3>Yêu cầu gần đây</h3>
+        <div *ngFor="let i of recentInquiries" class="mini-item">
+          <div><strong>{{ i.name }}</strong> - {{ i.subject }}</div>
+          <span class="badge" [class.badge-warning]="i.status==='pending'" [class.badge-success]="i.status==='replied'">{{ i.status }}</span>
+        </div>
+        <div *ngIf="recentInquiries.length === 0" class="empty-mini">
+          <span class="material-icons">inbox</span>
+          <p>Không có yêu cầu nào</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="loading-spinner" *ngIf="!stats"><div class="spinner"></div></div>

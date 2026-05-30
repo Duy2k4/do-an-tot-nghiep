@@ -1,0 +1,54 @@
+<section class="section inquiries-section">
+  <div class="container">
+    <div class="user-page-heading">
+      <div>
+        <h1>Yêu cầu của tôi</h1>
+      </div>
+      <a routerLink="/contact" class="btn btn-primary">
+        <span class="material-icons">send</span>
+        Gửi yêu cầu mới
+      </a>
+    </div>
+
+    <div class="loading-spinner" *ngIf="loading"><div class="spinner"></div></div>
+
+    <div class="inquiry-list" *ngIf="!loading && inquiries.length">
+      <div class="inquiry-card fade-in" *ngFor="let i of inquiries">
+        <div class="inquiry-icon">
+          <span class="material-icons">support_agent</span>
+        </div>
+        <div class="inquiry-main">
+          <div class="inquiry-topline">
+            <span class="inquiry-date">{{ i.createdAt | date:'dd/MM/yyyy' }}</span>
+            <span
+              class="status-pill"
+              [class.pending]="i.status === 'pending'"
+              [class.replied]="i.status === 'replied'"
+              [class.closed]="i.status === 'closed'">
+              {{ i.status === 'pending' ? 'Đang xử lý' : (i.status === 'replied' ? 'Đã phản hồi' : 'Đã đóng') }}
+            </span>
+          </div>
+          <h3>{{ i.subject }}</h3>
+          <div class="inquiry-meta">
+            <span class="type-pill">{{ i.type }}</span>
+            <span *ngIf="i.destination?.name">
+              <span class="material-icons">place</span>
+              {{ i.destination.name }}
+            </span>
+            <span *ngIf="i.tour?.name">
+              <span class="material-icons">tour</span>
+              {{ i.tour.name }}
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="empty-state inquiry-empty" *ngIf="!loading && inquiries.length === 0">
+      <span class="material-icons">inbox</span>
+      <h3>Chưa có yêu cầu nào</h3>
+      <p>Gửi yêu cầu tư vấn để được hỗ trợ lựa chọn điểm đến hoặc tour phù hợp.</p>
+      <a routerLink="/contact" class="btn btn-primary">Gửi yêu cầu</a>
+    </div>
+  </div>
+</section>

@@ -1,0 +1,52 @@
+
+<section class="section">
+  <div class="container">
+    <div class="admin-toolbar">
+      <div class="toolbar-search">
+        <span class="material-icons">search</span>
+        <input type="text" class="form-control" [(ngModel)]="search" (ngModelChange)="page = 1; load()" placeholder="Tìm kiếm tour...">
+      </div>
+      <a routerLink="/admin/tours/create" class="btn btn-primary"><span class="material-icons">add</span> Thêm mới</a>
+    </div>
+    <div class="loading-spinner" *ngIf="loading"><div class="spinner"></div></div>
+    <div class="data-table-wrapper" *ngIf="!loading">
+      <table class="data-table">
+        <thead><tr><th>Ảnh</th><th>Tên</th><th>Thời gian</th><th>Giá gốc</th><th>Giá KM</th><th>Trạng thái</th><th>Hành động</th></tr></thead>
+        <tbody>
+          <tr *ngFor="let t of data">
+            <td><img [src]="t.images?.[0]?.url ? api.mediaUrl(t.images[0].url) : (t.imageUrl ? api.mediaUrl(t.imageUrl) : 'https://picsum.photos/seed/' + t.slug + '/60/60')" alt="" style="width:50px;height:50px;object-fit:cover;border-radius:8px;"></td>
+            <td><strong>{{ t.name }}</strong></td>
+            <td>{{ t.duration }}</td>
+            <td><span style="text-decoration:line-through;color:var(--gray-light);">{{ t.price | number:'1.0-0' }}đ</span></td>
+            <td><span style="font-weight:700;color:var(--danger);">{{ (t.discountPrice || t.price) | number:'1.0-0' }}đ</span></td>
+            <td><span class="badge" [class.badge-success]="t.isActive" [class.badge-danger]="!t.isActive">{{ t.isActive ? 'Hoạt động' : 'Tắt' }}</span></td>
+            <td>
+              <div class="action-btns">
+                <a [routerLink]="['/admin/tours/edit', t.id]" class="btn btn-sm btn-outline"><span class="material-icons">edit</span></a>
+                <button class="btn btn-sm btn-danger" (click)="delete(t.id)"><span class="material-icons">delete</span></button>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="empty-state" *ngIf="!loading && data.length === 0">
+      <span class="material-icons">search_off</span>
+      <h3>Không có dữ liệu</h3>
+    </div>
+    <div class="pagination-wrapper" *ngIf="!loading && totalPages > 1">
+      <div class="pagination-info">Hiển thị {{ data.length }} / {{ total }} tour</div>
+      <div class="pagination">
+        <button (click)="prev()" [disabled]="page === 1" class="page-nav">
+          <span class="material-icons">chevron_left</span>
+        </button>
+        <button *ngFor="let p of pageNumbers" [class.active]="p === page" [class.ellipsis]="p === '...'" (click)="goTo(p)" [disabled]="p === '...'">
+          {{ p }}
+        </button>
+        <button (click)="next()" [disabled]="page === totalPages" class="page-nav">
+          <span class="material-icons">chevron_right</span>
+        </button>
+      </div>
+    </div>
+  </div>
+</section>

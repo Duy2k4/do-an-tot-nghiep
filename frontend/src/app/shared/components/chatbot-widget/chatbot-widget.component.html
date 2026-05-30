@@ -1,0 +1,107 @@
+<div class="chatbot-widget">
+  <button class="chatbot-toggle" (click)="toggleWindow()">
+    <span class="material-icons">{{ isOpen ? 'close' : 'chat' }}</span>
+    <span class="chat-badge" *ngIf="!isOpen && messages.length > 0">•</span>
+  </button>
+
+  <div class="chatbot-window" *ngIf="isOpen">
+    <!-- Phần đầu -->
+    <div class="chatbot-header">
+      <div class="header-info">
+        <div class="bot-avatar">
+          <span class="material-icons">smart_toy</span>
+        </div>
+        <div>
+          <h4>Trợ lý Du Lịch</h4>
+          <p>Luôn sẵn sàng hỗ trợ</p>
+        </div>
+      </div>
+      <button class="clear-btn" (click)="messages = []" *ngIf="messages.length > 0" title="Xóa cuộc trò chuyện">
+        <span class="material-icons">delete_outline</span>
+      </button>
+    </div>
+
+    <!-- Tin nhắn -->
+    <div class="chatbot-messages">
+      <!-- Chào mừng -->
+      <div *ngIf="messages.length === 0" class="welcome-section">
+        <div class="welcome-icon">
+          <span class="material-icons">support_agent</span>
+        </div>
+        <h3>Xin chào!</h3>
+        <p>Tôi có thể giúp bạn tìm địa điểm, gợi ý tour, tư vấn chi phí... Hãy hỏi tôi nhé!</p>
+
+        <div class="quick-actions">
+          <button
+            *ngFor="let action of quickActions"
+            class="quick-btn"
+            (click)="sendQuickMessage(action.query)">
+            <span class="material-icons">{{ action.icon }}</span>
+            <span>{{ action.label }}</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Danh sách tin nhắn -->
+      <div *ngFor="let msg of messages; trackBy: trackByFn" class="message" [class.user]="msg.role === 'user'" [class.bot]="msg.role === 'assistant'">
+        <div class="bot-avatar-sm" *ngIf="msg.role === 'assistant'">
+          <span class="material-icons">smart_toy</span>
+        </div>
+        <div class="message-content">
+          <div class="message-bubble">
+            <div class="message-text" [innerHTML]="formatMessage(msg.message)"></div>
+          </div>
+          <!-- Thẻ điểm đến -->
+          <div class="chat-cards" *ngIf="msg.cards?.length">
+            <a *ngFor="let card of msg.cards"
+               class="chat-card"
+               [routerLink]="['/destinations', card.slug]"
+               (click)="isOpen = false">
+              <img [src]="card.images?.[0]?.url || 'https://picsum.photos/seed/' + card.slug + '/200/120'" [alt]="card.name">
+              <div class="chat-card-info">
+                <strong>{{ card.name }}</strong>
+                <small>{{ card.province?.name }}</small>
+              </div>
+            </a>
+          </div>
+          <div class="message-meta">
+            <span class="meta-time">{{ formatTime(msg.timestamp) }}</span>
+            <span class="meta-source" *ngIf="msg.role === 'assistant' && msg.isTemplate">
+              <span class="material-icons">bolt</span> Nhanh
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Hiển thị đang nhập -->
+      <div *ngIf="showTyping" class="message bot">
+        <div class="bot-avatar-sm">
+          <span class="material-icons">smart_toy</span>
+        </div>
+        <div class="message-content">
+          <div class="message-bubble">
+            <div class="typing-indicator">
+              <span></span><span></span><span></span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Ô nhập -->
+    <div class="chatbot-input">
+      <input
+        type="text"
+        [(ngModel)]="inputMessage"
+        (keyup.enter)="sendMessage()"
+        placeholder="Nhắn tin hỏi về du lịch..."
+        [disabled]="loading">
+      <button
+        class="send-btn"
+        (click)="sendMessage()"
+        [disabled]="!inputMessage.trim() || loading">
+        <span class="material-icons">send</span>
+      </button>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,8 @@
+<app-navbar *ngIf="!isAdminRoute"></app-navbar>
+<main>
+  <router-outlet></router-outlet>
+</main>
+<app-footer *ngIf="!isAdminRoute"></app-footer>
+<app-chatbot-widget *ngIf="!isAdminRoute"></app-chatbot-widget>
+<app-auth-modal></app-auth-modal>
+<app-confirm-dialog></app-confirm-dialog>

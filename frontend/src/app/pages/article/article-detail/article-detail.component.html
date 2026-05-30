@@ -1,0 +1,177 @@
+<div *ngIf="article" class="fade-in">
+  <!-- Khu hero có slider ảnh -->
+  <div class="article-hero">
+    <ng-container *ngIf="article.images && article.images.length > 1">
+      <div class="hero-slider">
+        <div class="slider-container" [style.transform]="'translateX(-' + currentImageIndex * 100 + '%)'">
+          <img *ngFor="let img of article.images" [src]="img.url" [alt]="article.title">
+        </div>
+        <!-- Chấm điều hướng -->
+        <div class="slider-dots">
+          <span *ngFor="let img of article.images; let i = index"
+                [class.active]="i === currentImageIndex"
+                (click)="setImageIndex(i)"></span>
+        </div>
+        <!-- Mũi tên điều hướng -->
+        <button class="slider-arrow prev" (click)="prevImage()">
+          <span class="material-icons">chevron_left</span>
+        </button>
+        <button class="slider-arrow next" (click)="nextImage()">
+          <span class="material-icons">chevron_right</span>
+        </button>
+      </div>
+    </ng-container>
+    <!-- Một ảnh hoặc ảnh dự phòng -->
+    <ng-container *ngIf="!article.images || article.images.length <= 1">
+      <img [src]="getHeroImage()" [alt]="article.title">
+    </ng-container>
+    <div class="hero-overlay">
+      <div class="container">
+        <span class="badge badge-primary">{{ article.category?.name }}</span>
+        <h1>{{ article.title }}</h1>
+        <div class="article-meta">
+          <span><span class="material-icons">person</span> {{ article.author?.fullName }}</span>
+          <span><span class="material-icons">calendar_today</span> {{ article.publishedAt | date:'dd/MM/yyyy' }}</span>
+          <span><span class="material-icons">visibility</span> {{ article.viewCount }} lượt xem</span>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Ảnh thu nhỏ trong thư viện -->
+  <div class="image-gallery" *ngIf="article.images && article.images.length > 1">
+    <div class="container">
+      <div class="gallery-grid">
+        <img *ngFor="let img of article.images; let i = index"
+             [src]="img.url"
+             [alt]="img.caption || article.title"
+             [class.active]="i === currentImageIndex"
+             (click)="setImageIndex(i)">
+      </div>
+    </div>
+  </div>
+  
+  <section class="section">
+    <div class="container">
+      <div class="article-layout">
+        <article class="article-content">
+          <div class="content" [innerHTML]="article.content"></div>
+          <div class="article-tags" *ngIf="article.tags">
+            <span class="tag" *ngFor="let t of getTags()">#{{ t }}</span>
+          </div>
+        </article>
+      </div>
+    </div>
+  </section>
+</div>
+<div class="loading-spinner" *ngIf="!article"><div class="spinner"></div></div>
+
+<style>
+/* Kiểu slider hero */
+.hero-slider {
+  position: relative;
+  width: 100%;
+  height: 500px;
+  overflow: hidden;
+}
+.hero-slider .slider-container {
+  display: flex;
+  transition: transform 0.5s ease;
+  height: 100%;
+}
+.hero-slider .slider-container img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  flex-shrink: 0;
+}
+.hero-slider .slider-dots {
+  position: absolute;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 8px;
+  z-index: 10;
+}
+.hero-slider .slider-dots span {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.5);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.hero-slider .slider-dots span.active {
+  background: white;
+  transform: scale(1.3);
+}
+.hero-slider .slider-arrow {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 48px;
+  height: 48px;
+  border: none;
+  background: rgba(0,0,0,0.5);
+  color: white;
+  border-radius: 50%;
+  cursor: pointer;
+  opacity: 0.7;
+  transition: opacity 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10;
+}
+.hero-slider .slider-arrow:hover {
+  opacity: 1;
+  background: rgba(0,0,0,0.7);
+}
+.hero-slider .slider-arrow .material-icons {
+  font-size: 28px;
+}
+.hero-slider .slider-arrow.prev {
+  left: 20px;
+}
+.hero-slider .slider-arrow.next {
+  right: 20px;
+}
+
+/* Kiểu thư viện ảnh */
+.image-gallery {
+  background: #f8f9fa;
+  padding: 1rem 0;
+}
+.gallery-grid {
+  display: flex;
+  gap: 10px;
+  overflow-x: auto;
+  padding-bottom: 10px;
+}
+.gallery-grid::-webkit-scrollbar {
+  height: 6px;
+}
+.gallery-grid::-webkit-scrollbar-thumb {
+  background: #ccc;
+  border-radius: 3px;
+}
+.gallery-grid img {
+  width: 100px;
+  height: 70px;
+  object-fit: cover;
+  border-radius: 6px;
+  cursor: pointer;
+  opacity: 0.6;
+  transition: all 0.2s;
+  border: 2px solid transparent;
+  flex-shrink: 0;
+}
+.gallery-grid img:hover {
+  opacity: 0.9;
+}
+.gallery-grid img.active {
+  opacity: 1;
+  border-color: var(--primary);
+}
+</style>

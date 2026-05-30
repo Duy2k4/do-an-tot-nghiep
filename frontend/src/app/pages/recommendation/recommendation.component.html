@@ -1,0 +1,115 @@
+<div class="page-header ph-recommendation">
+  <div class="container">
+    <h1>Gợi Ý Thông Minh</h1>
+    <p>Trả lời vài câu hỏi để nhận gợi ý địa điểm phù hợp với bạn</p>
+  </div>
+</div>
+
+<section class="section section-alt">
+  <div class="container">
+    <div class="rec-layout">
+      <div class="rec-prefs-card">
+        <h3><span class="material-icons">tune</span> Bạn thích du lịch như thế nào?</h3>
+
+        <div class="pref-section">
+          <label><span class="material-icons">public</span> Khu vực</label>
+          <div class="chip-choices">
+            <button class="choice-chip" [class.active]="preferences.north" (click)="preferences.north = !preferences.north">
+              <span class="material-icons">ac_unit</span> Miền Bắc
+            </button>
+            <button class="choice-chip" [class.active]="preferences.central" (click)="preferences.central = !preferences.central">
+              <span class="material-icons">wb_sunny</span> Miền Trung
+            </button>
+            <button class="choice-chip" [class.active]="preferences.south" (click)="preferences.south = !preferences.south">
+              <span class="material-icons">beach_access</span> Miền Nam
+            </button>
+          </div>
+        </div>
+
+        <div class="pref-section">
+          <label><span class="material-icons">category</span> Loại hình</label>
+          <div class="chip-choices">
+            <button class="choice-chip" [class.active]="preferences.beach" (click)="preferences.beach = !preferences.beach">
+              <span class="material-icons">beach_access</span> Biển & Đảo
+            </button>
+            <button class="choice-chip" [class.active]="preferences.mountain" (click)="preferences.mountain = !preferences.mountain">
+              <span class="material-icons">landscape</span> Núi & Rừng
+            </button>
+            <button class="choice-chip" [class.active]="preferences.historic" (click)="preferences.historic = !preferences.historic">
+              <span class="material-icons">account_balance</span> Di Sản
+            </button>
+            <button class="choice-chip" [class.active]="preferences.nature" (click)="preferences.nature = !preferences.nature">
+              <span class="material-icons">park</span> Thiên Nhiên
+            </button>
+          </div>
+        </div>
+
+        <div class="pref-section">
+          <label><span class="material-icons">payments</span> Ngân sách</label>
+          <div class="chip-choices">
+            <button class="choice-chip budget low" [class.active]="preferences.budget === 'low'" (click)="preferences.budget = preferences.budget === 'low' ? null : 'low'">
+              <span class="material-icons">savings</span> Tiết kiệm
+            </button>
+            <button class="choice-chip budget mid" [class.active]="preferences.budget === 'medium'" (click)="preferences.budget = preferences.budget === 'medium' ? null : 'medium'">
+              <span class="material-icons">account_balance_wallet</span> Trung bình
+            </button>
+            <button class="choice-chip budget high" [class.active]="preferences.budget === 'high'" (click)="preferences.budget = preferences.budget === 'high' ? null : 'high'">
+              <span class="material-icons">diamond</span> Cao cấp
+            </button>
+          </div>
+        </div>
+
+        <button class="btn btn-primary btn-lg rec-submit" (click)="getRecommendations()" [disabled]="loading">
+          <span class="material-icons">auto_awesome</span>
+          {{ loading ? 'Đang phân tích...' : 'Gợi ý cho tôi' }}
+        </button>
+      </div>
+
+      <div class="rec-output-card">
+        <div class="rec-results-section" *ngIf="results">
+          <div class="rec-results-header">
+            <div>
+              <h2>Kết quả gợi ý</h2>
+              <p class="rec-count">{{ results.recommendations?.length || 0 }} địa điểm phù hợp</p>
+            </div>
+          </div>
+          <p class="algo-summary" *ngIf="results.summary">{{ results.summary }}</p>
+
+          <div class="rec-grid">
+            <a *ngFor="let r of results.recommendations; let i = index"
+              [routerLink]="['/destinations', r.slug]"
+              class="rec-card fade-in"
+              [style.animation-delay.ms]="i * 100">
+              <div class="rec-card-img">
+                <img [src]="r.images?.[0]?.url || 'https://picsum.photos/seed/' + r.slug + '/400/300'" [alt]="r.name">
+                <div class="rec-card-overlay"><span class="material-icons">explore</span></div>
+                <span class="rec-match-badge">{{ (r.matchScore || r.recommendationScore || 0) | number:'1.0-0' }}%</span>
+              </div>
+              <div class="rec-card-body">
+                <span class="rec-category">{{ r.category?.name || 'Điểm đến' }}</span>
+                <h4>{{ r.name }}</h4>
+                <p class="rec-location"><span class="material-icons">location_on</span> {{ r.province?.name }}</p>
+                <div class="rec-score-bar"><div class="rec-score-fill" [style.width.%]="r.matchScore || r.recommendationScore || 0"></div></div>
+                <p class="rec-reason" *ngIf="r.aiReason">"{{ r.aiReason }}"</p>
+              </div>
+            </a>
+          </div>
+        </div>
+
+        <div class="rec-loading" *ngIf="loading && !results">
+          <div class="rec-loading-content">
+            <div class="rec-spinner"></div>
+            <h3>Đang phân tích sở thích của bạn...</h3>
+            <p>AI đang tìm những địa điểm phù hợp nhất</p>
+          </div>
+        </div>
+
+        <div class="rec-empty" *ngIf="!loading && !results">
+          <span class="material-icons">travel_explore</span>
+          <h3>Chọn sở thích bên trái</h3>
+          <p>AI sẽ phân tích và gợi ý địa điểm phù hợp nhất với bạn</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>

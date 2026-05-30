@@ -1,0 +1,45 @@
+.admin-toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+  gap: 1rem;
+}
+.toolbar-search {
+  position: relative;
+  flex: 1;
+  max-width: 360px;
+  .material-icons {
+    position: absolute;
+    left: 0.875rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--gray);
+    font-size: 1.125rem;
+  }
+  .form-control {
+    padding-left: 2.75rem;
+  }
+}
+.user-cell {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+.user-avatar-sm {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: var(--light);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  .material-icons {
+    font-size: 1.125rem;
+    color: var(--gray);
+  }
+}
+
+.btn-sm .material-icons {
+  font-size: 1rem;
+}
