@@ -1,3 +1,4 @@
+// Service bài viết: chứa truy vấn Prisma và xử lý dữ liệu bài viết.
 const prisma = require('../utils/prisma');
 
 const articleListInclude = {
@@ -12,6 +13,7 @@ const articleInclude = {
   images: { orderBy: { sortOrder: 'asc' } },
 };
 
+// Hàm generateSlug: tạo slug không dấu từ tiêu đề/tên nội dung.
 function generateSlug(text) {
   return text
     .toLowerCase()
@@ -24,6 +26,7 @@ function generateSlug(text) {
     .trim() + '-' + Date.now().toString(36);
 }
 
+// Hàm buildArticleData: lọc dữ liệu bài viết được phép lưu và nối danh mục.
 function buildArticleData(data) {
   const allowedFields = [
     'title',
@@ -49,6 +52,7 @@ function buildArticleData(data) {
   return articleData;
 }
 
+// Hàm cleanArticleImages: chuẩn hóa danh sách ảnh bài viết trước khi lưu.
 function cleanArticleImages(images) {
   if (!Array.isArray(images)) return undefined;
   return images.map((img, index) => ({
@@ -59,6 +63,7 @@ function cleanArticleImages(images) {
   }));
 }
 
+// Hàm getArticles: lấy danh sách bài viết có phân trang, tìm kiếm và lọc.
 async function getArticles(query) {
   const {
     page = 1, limit = 9,
@@ -107,6 +112,7 @@ async function getArticles(query) {
   };
 }
 
+// Hàm getFeaturedArticles: lấy các bài viết nổi bật đang xuất bản.
 function getFeaturedArticles() {
   return prisma.article.findMany({
     where: { isPublished: true, isFeatured: true },
@@ -116,6 +122,7 @@ function getFeaturedArticles() {
   });
 }
 
+// Hàm getRecentArticles: lấy các bài viết mới xuất bản gần đây.
 function getRecentArticles() {
   return prisma.article.findMany({
     where: { isPublished: true },
@@ -125,6 +132,7 @@ function getRecentArticles() {
   });
 }
 
+// Hàm getArticleDetail: lấy chi tiết bài viết theo id/slug và tăng lượt xem.
 async function getArticleDetail(id) {
   const article = await prisma.article.findFirst({
     where: {
@@ -144,6 +152,7 @@ async function getArticleDetail(id) {
   return article;
 }
 
+// Hàm createArticle: tạo bài viết mới kèm tác giả, danh mục và ảnh.
 function createArticle(data, authorId) {
   const { images, slug: inputSlug } = data;
   const articleData = buildArticleData(data);
@@ -163,6 +172,7 @@ function createArticle(data, authorId) {
   });
 }
 
+// Hàm updateArticle: cập nhật bài viết và thay thế danh sách ảnh nếu có.
 async function updateArticle(id, data) {
   const { images, slug: inputSlug } = data;
   const cleanedImages = cleanArticleImages(images);
@@ -190,6 +200,7 @@ async function updateArticle(id, data) {
   });
 }
 
+// Hàm deleteArticle: xóa bài viết theo id.
 async function deleteArticle(id) {
   await prisma.article.delete({ where: { id } });
   return { message: 'Article deleted' };
@@ -204,3 +215,4 @@ module.exports = {
   updateArticle,
   deleteArticle,
 };
+

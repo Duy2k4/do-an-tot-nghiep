@@ -1,3 +1,4 @@
+// Route yêu cầu tư vấn: public gửi yêu cầu, admin quản lý phản hồi.
 const { Router } = require('express');
 const { body, validationResult } = require('express-validator');
 const inquiryController = require('../controllers/inquiry.controller');
@@ -5,6 +6,7 @@ const { authenticate, requireAdmin } = require('../middlewares/auth');
 
 const router = Router();
 
+// Hàm validate: kiểm tra lỗi validation từ express-validator trước khi vào controller.
 const validate = (req, res, next) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
@@ -31,3 +33,4 @@ router.put('/:id', authenticate, requireAdmin, [
 router.delete('/:id', authenticate, requireAdmin, inquiryController.deleteInquiry);
 
 module.exports = router;
+

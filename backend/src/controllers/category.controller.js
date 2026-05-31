@@ -1,5 +1,7 @@
+// Controller danh mục: điều phối request liên quan danh mục, tỉnh thành và tag.
 const categoryService = require('../services/category.service');
 
+// Hàm getDestinationCategories: lấy danh mục điểm đến kèm số lượng điểm đến.
 async function getDestinationCategories(req, res, next) {
   try {
     res.json(await categoryService.getDestinationCategories());
@@ -8,6 +10,7 @@ async function getDestinationCategories(req, res, next) {
   }
 }
 
+// Hàm getArticleCategories: lấy danh mục bài viết kèm số lượng bài viết.
 async function getArticleCategories(req, res, next) {
   try {
     res.json(await categoryService.getArticleCategories());
@@ -16,6 +19,7 @@ async function getArticleCategories(req, res, next) {
   }
 }
 
+// Hàm getProvinces: lấy danh sách tỉnh thành, có thể lọc theo vùng.
 async function getProvinces(req, res, next) {
   try {
     res.json(await categoryService.getProvinces(req.query.region));
@@ -24,6 +28,7 @@ async function getProvinces(req, res, next) {
   }
 }
 
+// Hàm syncExternalProvinces: đồng bộ tỉnh thành từ API ngoài vào database.
 async function syncExternalProvinces(req, res, next) {
   try {
     res.json(await categoryService.syncExternalProvinces());
@@ -32,6 +37,7 @@ async function syncExternalProvinces(req, res, next) {
   }
 }
 
+// Hàm getRegions: lấy danh sách vùng miền đang có trong database.
 async function getRegions(req, res, next) {
   try {
     res.json(await categoryService.getRegions());
@@ -40,6 +46,7 @@ async function getRegions(req, res, next) {
   }
 }
 
+// Hàm getTags: lấy danh sách tag kèm số điểm đến sử dụng.
 async function getTags(req, res, next) {
   try {
     res.json(await categoryService.getTags());
@@ -48,6 +55,7 @@ async function getTags(req, res, next) {
   }
 }
 
+// Hàm createDestinationCategory: admin tạo danh mục điểm đến.
 async function createDestinationCategory(req, res, next) {
   try {
     res.status(201).json(await categoryService.createDestinationCategory(req.body));
@@ -56,6 +64,7 @@ async function createDestinationCategory(req, res, next) {
   }
 }
 
+// Hàm updateDestinationCategory: admin cập nhật danh mục điểm đến.
 async function updateDestinationCategory(req, res, next) {
   try {
     res.json(await categoryService.updateDestinationCategory(req.params.id, req.body));
@@ -64,6 +73,7 @@ async function updateDestinationCategory(req, res, next) {
   }
 }
 
+// Hàm deleteDestinationCategory: admin xóa danh mục điểm đến.
 async function deleteDestinationCategory(req, res, next) {
   try {
     res.json(await categoryService.deleteDestinationCategory(req.params.id));
@@ -72,6 +82,7 @@ async function deleteDestinationCategory(req, res, next) {
   }
 }
 
+// Hàm createArticleCategory: admin tạo danh mục bài viết.
 async function createArticleCategory(req, res, next) {
   try {
     res.status(201).json(await categoryService.createArticleCategory(req.body));
@@ -80,6 +91,7 @@ async function createArticleCategory(req, res, next) {
   }
 }
 
+// Hàm updateArticleCategory: admin cập nhật danh mục bài viết.
 async function updateArticleCategory(req, res, next) {
   try {
     res.json(await categoryService.updateArticleCategory(req.params.id, req.body));
@@ -88,6 +100,7 @@ async function updateArticleCategory(req, res, next) {
   }
 }
 
+// Hàm deleteArticleCategory: admin xóa danh mục bài viết.
 async function deleteArticleCategory(req, res, next) {
   try {
     res.json(await categoryService.deleteArticleCategory(req.params.id));
@@ -110,3 +123,4 @@ module.exports = {
   updateArticleCategory,
   deleteArticleCategory,
 };
+

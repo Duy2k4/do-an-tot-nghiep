@@ -1,3 +1,4 @@
+// Route yêu thích: thao tác danh sách yêu thích của user đã đăng nhập.
 const { Router } = require('express');
 const { body, validationResult } = require('express-validator');
 const favoriteController = require('../controllers/favorite.controller');
@@ -5,6 +6,7 @@ const { authenticate } = require('../middlewares/auth');
 
 const router = Router();
 
+// Hàm validate: kiểm tra lỗi validation từ express-validator trước khi vào controller.
 const validate = (req, res, next) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) return res.status(400).json({ errors: errors.array() });
@@ -19,3 +21,4 @@ router.delete('/:destinationId', authenticate, favoriteController.removeFavorite
 router.get('/check/:destinationId', authenticate, favoriteController.checkFavorite);
 
 module.exports = router;
+

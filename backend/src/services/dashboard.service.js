@@ -1,5 +1,7 @@
+// Service dashboard: gom các thống kê tổng quan cho trang quản trị.
 const prisma = require('../utils/prisma');
 
+// Hàm getMonthlyStats: tính thống kê người dùng, đánh giá, yêu cầu theo 6 tháng gần nhất.
 async function getMonthlyStats() {
   const now = new Date();
   const months = [];
@@ -26,6 +28,7 @@ async function getMonthlyStats() {
   return months;
 }
 
+// Hàm getDashboard: gom toàn bộ số liệu cho dashboard admin.
 async function getDashboard() {
   const [
     totalDestinations, totalTours, totalArticles, totalUsers,
@@ -87,3 +90,4 @@ async function getDashboard() {
 }
 
 module.exports = { getDashboard };
+

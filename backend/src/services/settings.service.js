@@ -1,6 +1,8 @@
+// Service cài đặt: đọc public settings và cho admin cập nhật cấu hình.
 const jwt = require('jsonwebtoken');
 const prisma = require('../utils/prisma');
 
+// Hàm resolveIsAdmin: đọc token tùy chọn để xác định request có phải admin không.
 async function resolveIsAdmin(authHeader) {
   if (!authHeader) return false;
   try {
@@ -16,6 +18,7 @@ async function resolveIsAdmin(authHeader) {
   }
 }
 
+// Hàm toSettingsObject: chuyển danh sách setting thành object key-value.
 function toSettingsObject(settings) {
   const settingsObj = {};
   settings.forEach(setting => {
@@ -24,6 +27,7 @@ function toSettingsObject(settings) {
   return settingsObj;
 }
 
+// Hàm getSettings: lấy settings public hoặc toàn bộ settings nếu là admin.
 async function getSettings(query, authHeader) {
   const { group } = query;
   const where = group ? { group } : {};
@@ -36,6 +40,7 @@ async function getSettings(query, authHeader) {
   return { settings: toSettingsObject(settings), settingsList: settings, isAdmin };
 }
 
+// Hàm getSettingsByGroup: lấy settings theo nhóm cấu hình.
 async function getSettingsByGroup(group) {
   const settings = await prisma.siteSetting.findMany({
     where: { group },
@@ -44,6 +49,7 @@ async function getSettingsByGroup(group) {
   return { ...toSettingsObject(settings), _list: settings };
 }
 
+// Hàm getSettingByKey: lấy một setting theo key.
 async function getSettingByKey(key) {
   const setting = await prisma.siteSetting.findUnique({ where: { key } });
   if (!setting) {
@@ -54,6 +60,7 @@ async function getSettingByKey(key) {
   return setting;
 }
 
+// Hàm upsertSetting: admin tạo mới hoặc cập nhật một setting.
 function upsertSetting(data) {
   const { key, value, group, label, type, isPublic } = data;
   return prisma.siteSetting.upsert({
@@ -76,6 +83,7 @@ function upsertSetting(data) {
   });
 }
 
+// Hàm updateSettingsBulk: admin cập nhật nhiều setting cùng lúc.
 async function updateSettingsBulk(settings) {
   if (!settings || typeof settings !== 'object') {
     const error = new Error('Settings object is required');
@@ -103,6 +111,7 @@ async function updateSettingsBulk(settings) {
   return { message: 'Settings updated', settings: results };
 }
 
+// Hàm deleteSetting: admin xóa setting theo key.
 async function deleteSetting(key) {
   await prisma.siteSetting.delete({ where: { key } });
   return { message: 'Setting deleted' };
@@ -116,3 +125,4 @@ module.exports = {
   updateSettingsBulk,
   deleteSetting,
 };
+

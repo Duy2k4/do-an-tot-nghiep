@@ -1,3 +1,4 @@
+// Route người dùng: admin xem, khóa/mở khóa và xóa tài khoản.
 const { Router } = require('express');
 const userController = require('../controllers/user.controller');
 const { authenticate, requireAdmin } = require('../middlewares/auth');
@@ -9,3 +10,4 @@ router.put('/:id/toggle-active', authenticate, requireAdmin, userController.togg
 router.delete('/:id', authenticate, requireAdmin, userController.deleteUser);
 
 module.exports = router;
+

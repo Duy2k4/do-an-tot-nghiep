@@ -1,5 +1,7 @@
+// Controller bài viết: nhận request/response và chuyển xử lý nghiệp vụ sang service.
 const articleService = require('../services/article.service');
 
+// Hàm getArticles: lấy danh sách bài viết có phân trang, tìm kiếm và lọc.
 async function getArticles(req, res, next) {
   try {
     const result = await articleService.getArticles(req.query);
@@ -9,6 +11,7 @@ async function getArticles(req, res, next) {
   }
 }
 
+// Hàm getFeaturedArticles: lấy các bài viết nổi bật đang xuất bản.
 async function getFeaturedArticles(req, res, next) {
   try {
     const articles = await articleService.getFeaturedArticles();
@@ -18,6 +21,7 @@ async function getFeaturedArticles(req, res, next) {
   }
 }
 
+// Hàm getRecentArticles: lấy các bài viết mới xuất bản gần đây.
 async function getRecentArticles(req, res, next) {
   try {
     const articles = await articleService.getRecentArticles();
@@ -27,6 +31,7 @@ async function getRecentArticles(req, res, next) {
   }
 }
 
+// Hàm getArticleDetail: lấy chi tiết bài viết theo id/slug và tăng lượt xem.
 async function getArticleDetail(req, res, next) {
   try {
     const article = await articleService.getArticleDetail(req.params.id);
@@ -39,6 +44,7 @@ async function getArticleDetail(req, res, next) {
   }
 }
 
+// Hàm createArticle: tạo bài viết mới kèm tác giả, danh mục và ảnh.
 async function createArticle(req, res, next) {
   try {
     const article = await articleService.createArticle(req.body, req.user?.id);
@@ -48,6 +54,7 @@ async function createArticle(req, res, next) {
   }
 }
 
+// Hàm updateArticle: cập nhật bài viết và thay thế danh sách ảnh nếu có.
 async function updateArticle(req, res, next) {
   try {
     const article = await articleService.updateArticle(req.params.id, req.body);
@@ -57,6 +64,7 @@ async function updateArticle(req, res, next) {
   }
 }
 
+// Hàm deleteArticle: xóa bài viết theo id.
 async function deleteArticle(req, res, next) {
   try {
     const result = await articleService.deleteArticle(req.params.id);
@@ -75,3 +83,4 @@ module.exports = {
   updateArticle,
   deleteArticle,
 };
+

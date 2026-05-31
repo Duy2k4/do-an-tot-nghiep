@@ -1,7 +1,9 @@
+// Service xác thực: mã hóa mật khẩu, tạo JWT và cập nhật hồ sơ.
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const prisma = require('../utils/prisma');
 
+// Hàm buildAuthResponse: tạo JWT và chuẩn hóa dữ liệu user trả về sau đăng nhập/đăng ký.
 function buildAuthResponse(message, user) {
   const token = jwt.sign(
     { userId: user.id, role: user.role.name },
@@ -23,6 +25,7 @@ function buildAuthResponse(message, user) {
   };
 }
 
+// Hàm register: tạo tài khoản mới, mã hóa mật khẩu và trả token đăng nhập.
 async function register(data) {
   const { email, password, fullName, phone } = data;
   const existing = await prisma.user.findUnique({ where: { email } });
@@ -42,6 +45,7 @@ async function register(data) {
   return buildAuthResponse('Registration successful', user);
 }
 
+// Hàm login: kiểm tra email/mật khẩu, trạng thái tài khoản và trả token.
 async function login(data) {
   const { email, password } = data;
   const user = await prisma.user.findUnique({
@@ -71,10 +75,12 @@ async function login(data) {
   return buildAuthResponse('Login successful', user);
 }
 
+// Hàm getProfile: trả thông tin người dùng đang đăng nhập.
 function getProfile(user) {
   return { user };
 }
 
+// Hàm updateProfile: cập nhật thông tin hồ sơ người dùng hiện tại.
 async function updateProfile(userId, data) {
   const { fullName, phone, avatar } = data;
   const user = await prisma.user.update({
@@ -85,6 +91,7 @@ async function updateProfile(userId, data) {
   return { message: 'Profile updated', user };
 }
 
+// Hàm changePassword: kiểm tra mật khẩu cũ và lưu mật khẩu mới đã mã hóa.
 async function changePassword(userId, data) {
   const { currentPassword, newPassword } = data;
   const user = await prisma.user.findUnique({ where: { id: userId } });
@@ -112,3 +119,4 @@ module.exports = {
   updateProfile,
   changePassword,
 };
+

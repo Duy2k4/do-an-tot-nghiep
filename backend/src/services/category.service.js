@@ -1,5 +1,7 @@
+// Service danh mục: quản lý danh mục, tỉnh thành, vùng miền và tag.
 const prisma = require('../utils/prisma');
 
+// Hàm slugify: chuyển tên tiếng Việt sang slug không dấu.
 function slugify(text) {
   return String(text || '')
     .normalize('NFD')
@@ -13,10 +15,12 @@ function slugify(text) {
     .replace(/-+/g, '-');
 }
 
+// Hàm normalizeProvinceName: chuẩn hóa tên tỉnh để suy luận vùng miền.
 function normalizeProvinceName(text) {
   return slugify(text).replace(/-/g, ' ');
 }
 
+// Hàm inferRegion: suy luận vùng miền Bắc/Trung/Nam từ tên tỉnh.
 function inferRegion(name) {
   const normalized = normalizeProvinceName(name);
   const north = new Set([
@@ -37,6 +41,7 @@ function inferRegion(name) {
   return 'SOUTH';
 }
 
+// Hàm getDestinationCategories: lấy danh mục điểm đến kèm số lượng điểm đến.
 function getDestinationCategories() {
   return prisma.destinationCategory.findMany({
     include: { _count: { select: { destinations: true } } },
@@ -44,6 +49,7 @@ function getDestinationCategories() {
   });
 }
 
+// Hàm getArticleCategories: lấy danh mục bài viết kèm số lượng bài viết.
 function getArticleCategories() {
   return prisma.articleCategory.findMany({
     include: { _count: { select: { articles: true } } },
@@ -51,6 +57,7 @@ function getArticleCategories() {
   });
 }
 
+// Hàm getProvinces: lấy danh sách tỉnh thành, có thể lọc theo vùng.
 function getProvinces(region) {
   return prisma.province.findMany({
     where: region ? { region } : {},
@@ -59,6 +66,7 @@ function getProvinces(region) {
   });
 }
 
+// Hàm syncExternalProvinces: đồng bộ tỉnh thành từ API ngoài vào database.
 async function syncExternalProvinces() {
   const response = await fetch('https://provinces.open-api.vn/api/p/');
   if (!response.ok) {
@@ -87,6 +95,7 @@ async function syncExternalProvinces() {
   return getProvinces();
 }
 
+// Hàm getRegions: lấy danh sách vùng miền đang có trong database.
 async function getRegions() {
   const provinces = await prisma.province.findMany({ select: { region: true } });
   const regions = [...new Set(provinces.map(p => p.region))];
@@ -96,6 +105,7 @@ async function getRegions() {
   }));
 }
 
+// Hàm getTags: lấy danh sách tag kèm số điểm đến sử dụng.
 function getTags() {
   return prisma.tag.findMany({
     include: { _count: { select: { destinations: true } } },
@@ -103,27 +113,33 @@ function getTags() {
   });
 }
 
+// Hàm createDestinationCategory: admin tạo danh mục điểm đến.
 function createDestinationCategory(data) {
   return prisma.destinationCategory.create({ data });
 }
 
+// Hàm updateDestinationCategory: admin cập nhật danh mục điểm đến.
 function updateDestinationCategory(id, data) {
   return prisma.destinationCategory.update({ where: { id }, data });
 }
 
+// Hàm deleteDestinationCategory: admin xóa danh mục điểm đến.
 async function deleteDestinationCategory(id) {
   await prisma.destinationCategory.delete({ where: { id } });
   return { message: 'Category deleted' };
 }
 
+// Hàm createArticleCategory: admin tạo danh mục bài viết.
 function createArticleCategory(data) {
   return prisma.articleCategory.create({ data });
 }
 
+// Hàm updateArticleCategory: admin cập nhật danh mục bài viết.
 function updateArticleCategory(id, data) {
   return prisma.articleCategory.update({ where: { id }, data });
 }
 
+// Hàm deleteArticleCategory: admin xóa danh mục bài viết.
 async function deleteArticleCategory(id) {
   await prisma.articleCategory.delete({ where: { id } });
   return { message: 'Category deleted' };
@@ -143,3 +159,4 @@ module.exports = {
   updateArticleCategory,
   deleteArticleCategory,
 };
+

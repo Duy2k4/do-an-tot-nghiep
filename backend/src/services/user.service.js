@@ -1,5 +1,7 @@
+// Service người dùng: tìm kiếm, khóa/mở khóa và xóa tài khoản.
 const prisma = require('../utils/prisma');
 
+// Hàm getUsers: admin lấy danh sách người dùng có phân trang và tìm kiếm.
 async function getUsers(query) {
   const { page = 1, limit = 20, search, role } = query;
   const currentPage = parseInt(page);
@@ -47,6 +49,7 @@ async function getUsers(query) {
   };
 }
 
+// Hàm toggleUserActive: admin khóa hoặc mở khóa tài khoản người dùng.
 async function toggleUserActive(id, currentUserId) {
   const user = await prisma.user.findUnique({ where: { id } });
   if (!user) {
@@ -67,6 +70,7 @@ async function toggleUserActive(id, currentUserId) {
   return { message: 'User status updated', user: { id: updated.id, isActive: updated.isActive } };
 }
 
+// Hàm deleteUser: admin xóa người dùng, không cho tự xóa chính mình.
 async function deleteUser(id, currentUserId) {
   if (id === currentUserId) {
     const error = new Error('Cannot delete yourself');
@@ -78,3 +82,4 @@ async function deleteUser(id, currentUserId) {
 }
 
 module.exports = { getUsers, toggleUserActive, deleteUser };
+

@@ -1,3 +1,4 @@
+// Route booking: user đặt/hủy tour, admin quản lý toàn bộ booking.
 const { Router } = require('express');
 const { body, validationResult } = require('express-validator');
 const bookingController = require('../controllers/booking.controller');
@@ -5,6 +6,7 @@ const { authenticate, requireAdmin } = require('../middlewares/auth');
 
 const router = Router();
 
+// Hàm validate: kiểm tra lỗi validation từ express-validator trước khi vào controller.
 const validate = (req, res, next) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
@@ -35,3 +37,4 @@ router.patch('/:id/cancel', authenticate, bookingController.cancelMyBooking);
 router.delete('/:id', authenticate, requireAdmin, bookingController.deleteBooking);
 
 module.exports = router;
+

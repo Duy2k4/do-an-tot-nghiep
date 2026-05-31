@@ -1,3 +1,4 @@
+// Route upload: admin tải ảnh lên thư mục public uploads.
 const { Router } = require('express');
 const multer = require('multer');
 const path = require('path');
@@ -23,6 +24,7 @@ const storage = multer.diskStorage({
   },
 });
 
+// Hàm fileFilter: xử lý logic tương ứng của module này.
 const fileFilter = (req, file, cb) => {
   const allowedTypes = /jpeg|jpg|png|gif|webp|svg/;
   const extname = allowedTypes.test(path.extname(file.originalname).toLowerCase());
@@ -44,3 +46,4 @@ router.post('/image', authenticate, requireAdmin, upload.single('image'), upload
 router.post('/images', authenticate, requireAdmin, upload.array('images', 10), uploadController.uploadImages);
 
 module.exports = router;
+

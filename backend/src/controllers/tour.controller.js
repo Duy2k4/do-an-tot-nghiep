@@ -1,5 +1,7 @@
+// Controller tour: xử lý API danh sách, chi tiết và CRUD tour.
 const tourService = require('../services/tour.service');
 
+// Hàm getTours: lấy danh sách tour có phân trang, tìm kiếm và lọc.
 async function getTours(req, res, next) {
   try {
     res.json(await tourService.getTours(req.query));
@@ -8,6 +10,7 @@ async function getTours(req, res, next) {
   }
 }
 
+// Hàm getFeaturedTours: lấy danh sách tour nổi bật.
 async function getFeaturedTours(req, res, next) {
   try {
     res.json(await tourService.getFeaturedTours());
@@ -16,6 +19,7 @@ async function getFeaturedTours(req, res, next) {
   }
 }
 
+// Hàm getTourDetail: lấy chi tiết tour theo id/slug.
 async function getTourDetail(req, res, next) {
   try {
     const tour = await tourService.getTourDetail(req.params.id);
@@ -28,6 +32,7 @@ async function getTourDetail(req, res, next) {
   }
 }
 
+// Hàm createTour: admin tạo tour mới kèm lịch trình và ảnh.
 async function createTour(req, res, next) {
   try {
     res.status(201).json(await tourService.createTour(req.body));
@@ -36,6 +41,7 @@ async function createTour(req, res, next) {
   }
 }
 
+// Hàm updateTour: admin cập nhật tour, lịch trình và ảnh.
 async function updateTour(req, res, next) {
   try {
     res.json(await tourService.updateTour(req.params.id, req.body));
@@ -44,6 +50,7 @@ async function updateTour(req, res, next) {
   }
 }
 
+// Hàm deleteTour: admin xóa tour theo id.
 async function deleteTour(req, res, next) {
   try {
     res.json(await tourService.deleteTour(req.params.id));
@@ -60,3 +67,4 @@ module.exports = {
   updateTour,
   deleteTour,
 };
+

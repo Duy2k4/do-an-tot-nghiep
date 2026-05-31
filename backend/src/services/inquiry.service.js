@@ -1,5 +1,7 @@
+// Service yêu cầu tư vấn: lưu yêu cầu và cập nhật trạng thái phản hồi.
 const prisma = require('../utils/prisma');
 
+// Hàm getInquiries: admin lấy danh sách yêu cầu tư vấn có phân trang và lọc.
 async function getInquiries(query) {
   const { page = 1, limit = 20, status, type } = query;
   const currentPage = parseInt(page);
@@ -31,6 +33,7 @@ async function getInquiries(query) {
   };
 }
 
+// Hàm getMyInquiries: lấy yêu cầu tư vấn của người dùng hiện tại.
 function getMyInquiries(userId) {
   return prisma.inquiry.findMany({
     where: { userId },
@@ -39,6 +42,7 @@ function getMyInquiries(userId) {
   });
 }
 
+// Hàm createInquiry: tạo yêu cầu tư vấn từ form liên hệ.
 async function createInquiry(data, userId) {
   const { name, email, phone, type, subject, message, tourId } = data;
   const inquiry = await prisma.inquiry.create({
@@ -56,6 +60,7 @@ async function createInquiry(data, userId) {
   return { message: 'Your inquiry has been submitted', inquiry };
 }
 
+// Hàm updateInquiry: admin cập nhật trạng thái/phản hồi yêu cầu tư vấn.
 function updateInquiry(id, data) {
   const { status, reply } = data;
   return prisma.inquiry.update({
@@ -68,6 +73,7 @@ function updateInquiry(id, data) {
   });
 }
 
+// Hàm deleteInquiry: admin xóa yêu cầu tư vấn.
 async function deleteInquiry(id) {
   await prisma.inquiry.delete({ where: { id } });
   return { message: 'Inquiry deleted' };
@@ -80,3 +86,4 @@ module.exports = {
   updateInquiry,
   deleteInquiry,
 };
+

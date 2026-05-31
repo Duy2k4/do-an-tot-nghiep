@@ -1,5 +1,7 @@
+// Service tour: truy vấn tour, xử lý lịch trình, ảnh và giá.
 const prisma = require('../utils/prisma');
 
+// Hàm generateSlug: tạo slug không dấu từ tiêu đề/tên nội dung.
 function generateSlug(text) {
   return text
     .toLowerCase()
@@ -12,6 +14,7 @@ function generateSlug(text) {
     .trim() + '-' + Date.now().toString(36);
 }
 
+// Hàm buildTourData: lọc dữ liệu tour được phép lưu và nối điểm đến.
 function buildTourData(data) {
   const allowedFields = [
     'name',
@@ -44,6 +47,7 @@ function buildTourData(data) {
   return tourData;
 }
 
+// Hàm cleanSchedules: chuẩn hóa lịch trình tour trước khi lưu.
 function cleanSchedules(schedules) {
   if (!Array.isArray(schedules)) return undefined;
   return schedules.map(schedule => ({
@@ -55,6 +59,7 @@ function cleanSchedules(schedules) {
   }));
 }
 
+// Hàm cleanTourImages: chuẩn hóa danh sách ảnh tour trước khi lưu.
 function cleanTourImages(images) {
   if (!Array.isArray(images)) return undefined;
   return images.map((img, idx) => ({
@@ -65,6 +70,7 @@ function cleanTourImages(images) {
   }));
 }
 
+// Hàm withRating: tính điểm đánh giá trung bình cho danh sách tour.
 function withRating(tours) {
   return tours.map(tour => ({
     ...tour,
@@ -75,6 +81,7 @@ function withRating(tours) {
   }));
 }
 
+// Hàm getTours: lấy danh sách tour có phân trang, tìm kiếm và lọc.
 async function getTours(query) {
   const {
     page = 1, limit = 12,
@@ -132,6 +139,7 @@ async function getTours(query) {
   };
 }
 
+// Hàm getFeaturedTours: lấy danh sách tour nổi bật.
 function getFeaturedTours() {
   return prisma.tour.findMany({
     where: { isActive: true, isFeatured: true },
@@ -144,6 +152,7 @@ function getFeaturedTours() {
   });
 }
 
+// Hàm getTourDetail: lấy chi tiết tour theo id/slug.
 function getTourDetail(id) {
   return prisma.tour.findFirst({
     where: {
@@ -163,6 +172,7 @@ function getTourDetail(id) {
   });
 }
 
+// Hàm createTour: admin tạo tour mới kèm lịch trình và ảnh.
 function createTour(data) {
   const { images, slug: inputSlug, schedules } = data;
   const tourData = buildTourData(data);
@@ -184,6 +194,7 @@ function createTour(data) {
   });
 }
 
+// Hàm updateTour: admin cập nhật tour, lịch trình và ảnh.
 async function updateTour(id, data) {
   const { images, slug: inputSlug, schedules } = data;
   const cleanedSchedules = cleanSchedules(schedules);
@@ -212,6 +223,7 @@ async function updateTour(id, data) {
   });
 }
 
+// Hàm deleteTour: admin xóa tour theo id.
 async function deleteTour(id) {
   await prisma.tour.delete({ where: { id } });
   return { message: 'Tour deleted' };
@@ -225,3 +237,4 @@ module.exports = {
   updateTour,
   deleteTour,
 };
+

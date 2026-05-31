@@ -1,13 +1,17 @@
+// Service đánh giá: quản lý review và cập nhật điểm trung bình điểm đến.
 const prisma = require('../utils/prisma');
 
+// Hàm getReviewsByDestination: lấy đánh giá của một điểm đến.
 async function getReviewsByDestination(destinationId, query) {
   return getReviews({ destinationId }, query);
 }
 
+// Hàm getReviewsByTour: lấy đánh giá của một tour.
 async function getReviewsByTour(tourId, query) {
   return getReviews({ tourId }, query);
 }
 
+// Hàm getReviews: lấy review theo điều kiện có phân trang.
 async function getReviews(where, query) {
   const { page = 1, limit = 10 } = query;
   const currentPage = parseInt(page);
@@ -35,6 +39,7 @@ async function getReviews(where, query) {
   };
 }
 
+// Hàm getAllReviews: admin lấy toàn bộ đánh giá có phân trang.
 async function getAllReviews(query) {
   const { page = 1, limit = 10 } = query;
   const currentPage = parseInt(page);
@@ -65,6 +70,7 @@ async function getAllReviews(query) {
   };
 }
 
+// Hàm updateDestinationRating: tính lại điểm trung bình và số đánh giá của điểm đến.
 async function updateDestinationRating(destinationId) {
   const stats = await prisma.review.aggregate({
     where: { destinationId },
@@ -77,6 +83,7 @@ async function updateDestinationRating(destinationId) {
   });
 }
 
+// Hàm createReview: người dùng tạo đánh giá cho điểm đến hoặc tour.
 async function createReview(userId, data) {
   const { destinationId, tourId, rating, comment } = data;
   if (!destinationId && !tourId) {
@@ -97,6 +104,7 @@ async function createReview(userId, data) {
   return review;
 }
 
+// Hàm deleteReview: xóa đánh giá nếu là chủ sở hữu hoặc admin.
 async function deleteReview(id, user) {
   const review = await prisma.review.findUnique({ where: { id } });
   if (!review) {
@@ -126,3 +134,4 @@ module.exports = {
   createReview,
   deleteReview,
 };
+

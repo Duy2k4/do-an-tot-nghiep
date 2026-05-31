@@ -1,3 +1,4 @@
+// Service gợi ý: gọi AI để chọn điểm đến phù hợp và ghi log kết quả.
 const prisma = require('../utils/prisma');
 const { v4: uuidv4 } = require('uuid');
 require('dotenv').config({ override: true });
@@ -5,6 +6,7 @@ require('dotenv').config({ override: true });
 const DEEPSEEK_MODEL = 'deepseek-v4-flash';
 const DEEPSEEK_API_URL = 'https://api.deepseek.com/v1/chat/completions';
 
+// Hàm buildDestinationContext: lấy và rút gọn dữ liệu điểm đến làm input cho AI gợi ý.
 async function buildDestinationContext(limit = 30) {
   const destinations = await prisma.destination.findMany({
     where: { isActive: true },
@@ -36,6 +38,7 @@ async function buildDestinationContext(limit = 30) {
   }));
 }
 
+// Hàm callDeepSeek: gửi prompt gợi ý sang DeepSeek và nhận JSON kết quả.
 async function callDeepSeek(messages) {
   const apiKey = process.env.DEEPSEEK_API_KEY;
   if (!apiKey || apiKey === 'your-deepseek-api-key-here') {
@@ -66,6 +69,7 @@ async function callDeepSeek(messages) {
   return response.json();
 }
 
+// Hàm buildPreferenceSummary: chuyển sở thích người dùng thành mô tả ngắn cho AI.
 function buildPreferenceSummary(preferences) {
   const {
     regions = [],
@@ -87,6 +91,7 @@ function buildPreferenceSummary(preferences) {
   return prefSummary;
 }
 
+// Hàm getRecommendations: gọi AI gợi ý, enrich dữ liệu điểm đến và ghi log.
 async function getRecommendations(preferences = {}, userId = null) {
   const sessionId = uuidv4();
   const destinations = await buildDestinationContext(30);
@@ -164,6 +169,7 @@ Quy tắc:
   };
 }
 
+// Hàm getPopularRecommendations: lấy các điểm đến phổ biến theo lượt xem.
 function getPopularRecommendations() {
   return prisma.destination.findMany({
     where: { isActive: true },
@@ -178,3 +184,4 @@ function getPopularRecommendations() {
 }
 
 module.exports = { getRecommendations, getPopularRecommendations };
+

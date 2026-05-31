@@ -1,3 +1,4 @@
+// Service điểm đến: truy vấn, tạo, cập nhật và xử lý ảnh/tag điểm đến.
 const prisma = require('../utils/prisma');
 
 const destinationCardInclude = {
@@ -6,6 +7,7 @@ const destinationCardInclude = {
   province: true,
 };
 
+// Hàm buildDestinationData: lọc dữ liệu điểm đến được phép lưu và nối tỉnh/danh mục.
 function buildDestinationData(data) {
   const allowedFields = [
     'name',
@@ -45,6 +47,7 @@ function buildDestinationData(data) {
   return destinationData;
 }
 
+// Hàm cleanDestinationImages: chuẩn hóa danh sách ảnh điểm đến trước khi lưu.
 function cleanDestinationImages(images) {
   if (!Array.isArray(images)) return undefined;
   return images.map((img, idx) => ({
@@ -55,6 +58,7 @@ function cleanDestinationImages(images) {
   }));
 }
 
+// Hàm getDestinations: lấy danh sách điểm đến có phân trang, tìm kiếm và lọc.
 async function getDestinations(query) {
   const {
     page = 1, limit = 12,
@@ -106,6 +110,7 @@ async function getDestinations(query) {
   };
 }
 
+// Hàm getFeaturedDestinations: lấy danh sách điểm đến nổi bật.
 function getFeaturedDestinations() {
   return prisma.destination.findMany({
     where: { isActive: true, isFeatured: true },
@@ -115,6 +120,7 @@ function getFeaturedDestinations() {
   });
 }
 
+// Hàm getDestinationDetail: lấy chi tiết điểm đến theo id/slug và tăng lượt xem.
 async function getDestinationDetail(id) {
   const destination = await prisma.destination.findFirst({
     where: {
@@ -145,6 +151,7 @@ async function getDestinationDetail(id) {
   return destination;
 }
 
+// Hàm createDestination: admin tạo điểm đến mới kèm ảnh và tag.
 function createDestination(data) {
   const destinationData = buildDestinationData(data);
   const images = cleanDestinationImages(data.images);
@@ -166,6 +173,7 @@ function createDestination(data) {
   });
 }
 
+// Hàm updateDestination: admin cập nhật điểm đến và thay ảnh nếu có.
 function updateDestination(id, data) {
   const destinationData = buildDestinationData(data);
   const images = cleanDestinationImages(data.images);
@@ -188,6 +196,7 @@ function updateDestination(id, data) {
   });
 }
 
+// Hàm deleteDestination: admin xóa điểm đến theo id.
 async function deleteDestination(id) {
   await prisma.destination.delete({ where: { id } });
   return { message: 'Destination deleted' };
@@ -201,3 +210,4 @@ module.exports = {
   updateDestination,
   deleteDestination,
 };
+

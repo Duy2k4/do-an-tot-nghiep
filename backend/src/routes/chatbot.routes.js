@@ -1,3 +1,4 @@
+// Route chatbot: gửi tin nhắn, lấy lịch sử và xem context rút gọn.
 const { Router } = require('express');
 const { body, validationResult } = require('express-validator');
 const chatbotController = require('../controllers/chatbot.controller');
@@ -5,6 +6,7 @@ const { authenticate, optionalAuth } = require('../middlewares/auth');
 
 const router = Router();
 
+// Hàm validate: kiểm tra lỗi validation từ express-validator trước khi vào controller.
 const validate = (req, res, next) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
@@ -21,3 +23,4 @@ router.get('/history', authenticate, chatbotController.getHistory);
 router.get('/context', chatbotController.getContextPreview);
 
 module.exports = router;
+

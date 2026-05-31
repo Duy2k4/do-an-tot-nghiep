@@ -1,3 +1,4 @@
+// Service chatbot: xây dựng context dữ liệu và gọi DeepSeek để trả lời người dùng.
 const prisma = require('../utils/prisma');
 const { v4: uuidv4 } = require('uuid');
 require('dotenv').config({ override: true });
@@ -8,6 +9,7 @@ const DB_CACHE_TTL = 10 * 60 * 1000;
 
 let dbContextCache = { context: null, timestamp: 0 };
 
+// Hàm buildDatabaseContext: gom dữ liệu điểm đến, tour, bài viết làm ngữ cảnh cho chatbot.
 async function buildDatabaseContext() {
   try {
     const [destinations, tours, articles, categories] = await Promise.all([
@@ -83,6 +85,7 @@ async function buildDatabaseContext() {
   }
 }
 
+// Hàm getCachedDbContext: lấy context chatbot từ cache hoặc tạo lại khi hết hạn.
 async function getCachedDbContext() {
   const now = Date.now();
   if (!dbContextCache.context || (now - dbContextCache.timestamp) > DB_CACHE_TTL) {
@@ -92,6 +95,7 @@ async function getCachedDbContext() {
   return dbContextCache.context;
 }
 
+// Hàm normalizeSearchText: chuẩn hóa văn bản để so khớp tên địa điểm.
 function normalizeSearchText(value) {
   return String(value || '')
     .normalize('NFD')
@@ -104,6 +108,7 @@ function normalizeSearchText(value) {
     .replace(/\s+/g, ' ');
 }
 
+// Hàm includesAlias: kiểm tra một tên gọi khác có xuất hiện trong câu hỏi không.
 function includesAlias(haystack, alias) {
   const normalizedAlias = normalizeSearchText(alias);
   if (normalizedAlias.length < 3) return false;
@@ -116,6 +121,7 @@ function includesAlias(haystack, alias) {
   return compactAlias.length >= 4 && compactHaystack.includes(compactAlias);
 }
 
+// Hàm findMentionedDestinationSlugs: tìm các địa điểm được nhắc trong câu hỏi/câu trả lời.
 async function findMentionedDestinationSlugs(text, limit = 4) {
   const haystack = normalizeSearchText(text);
   if (!haystack) return [];
@@ -149,6 +155,7 @@ async function findMentionedDestinationSlugs(text, limit = 4) {
     .slice(0, limit);
 }
 
+// Hàm getDestinationCardsBySlugs: lấy dữ liệu card điểm đến theo slug để frontend hiển thị.
 async function getDestinationCardsBySlugs(slugs) {
   const uniqueSlugs = [...new Set(slugs.filter(Boolean))];
   if (uniqueSlugs.length === 0) return [];
@@ -167,6 +174,7 @@ async function getDestinationCardsBySlugs(slugs) {
   return uniqueSlugs.map(slug => cards.find(card => card.slug === slug)).filter(Boolean);
 }
 
+// Hàm buildSystemPrompt: tạo prompt hệ thống cho chatbot dựa trên context database.
 function buildSystemPrompt(dbContext) {
   return `Bạn là trợ lý du lịch AI của website Du Lịch Quảng Bá, chuyên tư vấn về du lịch Việt Nam.
 
@@ -186,6 +194,7 @@ ${dbContext}
 Hãy trả lời dựa trên thông tin có sẵn và đưa ra gợi ý hữu ích cho người dùng.`;
 }
 
+// Hàm chatWithDeepSeek: gửi hội thoại sang DeepSeek và lấy nội dung trả lời.
 async function chatWithDeepSeek(messages) {
   const apiKey = process.env.DEEPSEEK_API_KEY;
   if (!apiKey || apiKey === 'your-deepseek-api-key-here') {
@@ -216,6 +225,7 @@ async function chatWithDeepSeek(messages) {
   return data.choices?.[0]?.message?.content || 'Xin lỗi, tôi không thể trả lời lúc này.';
 }
 
+// Hàm sendMessage: lưu tin nhắn, gọi AI, trích xuất card và lưu phản hồi.
 async function sendMessage(data, userId) {
   const { message, sessionId: providedSessionId } = data;
   const sessionId = providedSessionId || uuidv4();
@@ -259,6 +269,7 @@ async function sendMessage(data, userId) {
   return { reply, sessionId, cards };
 }
 
+// Hàm getHistory: lấy lịch sử chatbot của người dùng hiện tại.
 function getHistory(userId, query) {
   const { sessionId } = query;
   const where = { userId };
@@ -271,6 +282,7 @@ function getHistory(userId, query) {
   });
 }
 
+// Hàm getContextPreview: trả bản xem trước context chatbot để kiểm tra nhanh.
 async function getContextPreview() {
   const context = await getCachedDbContext();
   return { context: context.substring(0, 500) + '...' };
@@ -281,3 +293,4 @@ module.exports = {
   getHistory,
   getContextPreview,
 };
+

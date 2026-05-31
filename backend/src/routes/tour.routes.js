@@ -1,3 +1,4 @@
+// Route tour: public xem tour, admin tạo/sửa/xóa tour.
 const { Router } = require('express');
 const { body, validationResult } = require('express-validator');
 const tourController = require('../controllers/tour.controller');
@@ -5,6 +6,7 @@ const { authenticate, requireAdmin } = require('../middlewares/auth');
 
 const router = Router();
 
+// Hàm validate: kiểm tra lỗi validation từ express-validator trước khi vào controller.
 const validate = (req, res, next) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
@@ -32,3 +34,4 @@ router.put('/:id', authenticate, requireAdmin, [
 router.delete('/:id', authenticate, requireAdmin, tourController.deleteTour);
 
 module.exports = router;
+

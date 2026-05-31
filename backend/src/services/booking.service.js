@@ -1,3 +1,4 @@
+// Service booking: kiểm tra điều kiện đặt tour, tính tổng tiền và thao tác Prisma.
 const prisma = require('../utils/prisma');
 
 const bookingInclude = {
@@ -17,6 +18,8 @@ const bookingInclude = {
   },
 };
 
+// Tạo mã booking dễ đọc theo ngày, kèm hậu tố ngẫu nhiên để giảm trùng lặp.
+// Hàm generateBookingCode: tạo mã booking theo ngày và hậu tố ngẫu nhiên.
 function generateBookingCode() {
   const date = new Date();
   const ymd = date.toISOString().slice(0, 10).replace(/-/g, '');
@@ -24,6 +27,8 @@ function generateBookingCode() {
   return `BK${ymd}${suffix}`;
 }
 
+// Đảm bảo bookingCode là duy nhất trước khi lưu vào database.
+// Hàm buildUniqueBookingCode: tạo mã booking không trùng trong database.
 async function buildUniqueBookingCode() {
   for (let i = 0; i < 5; i++) {
     const bookingCode = generateBookingCode();
@@ -33,6 +38,8 @@ async function buildUniqueBookingCode() {
   return `BK${Date.now().toString(36).toUpperCase()}`;
 }
 
+// Chuẩn hóa ngày khởi hành từ dữ liệu client gửi lên.
+// Hàm parseStartDate: chuyển ngày khởi hành từ client sang Date hợp lệ.
 function parseStartDate(value) {
   const startDate = new Date(value);
   if (Number.isNaN(startDate.getTime())) {
@@ -43,6 +50,8 @@ function parseStartDate(value) {
   return startDate;
 }
 
+// Không cho phép đặt tour với ngày đã qua.
+// Hàm ensureFutureDate: đảm bảo ngày khởi hành không nằm trong quá khứ.
 function ensureFutureDate(startDate) {
   const today = new Date();
   today.setHours(0, 0, 0, 0);
@@ -56,6 +65,7 @@ function ensureFutureDate(startDate) {
   }
 }
 
+// Hàm getBookings: admin lấy danh sách booking có phân trang, lọc và tìm kiếm.
 async function getBookings(query) {
   const { page = 1, limit = 20, status, search } = query;
   const currentPage = parseInt(page);
@@ -96,6 +106,7 @@ async function getBookings(query) {
   };
 }
 
+// Hàm getMyBookings: lấy danh sách booking của người dùng hiện tại.
 function getMyBookings(userId) {
   return prisma.booking.findMany({
     where: { userId },
@@ -104,6 +115,7 @@ function getMyBookings(userId) {
   });
 }
 
+// Hàm getBooking: lấy chi tiết booking và kiểm tra quyền xem.
 async function getBooking(id, user) {
   const booking = await prisma.booking.findUnique({
     where: { id },
@@ -115,6 +127,7 @@ async function getBooking(id, user) {
     error.status = 404;
     throw error;
   }
+  // Người dùng chỉ được xem booking của chính mình; admin được xem tất cả.
   if (booking.userId !== user.id && user.role.name !== 'admin') {
     const error = new Error('Not authorized');
     error.status = 403;
@@ -124,6 +137,7 @@ async function getBooking(id, user) {
   return booking;
 }
 
+// Hàm createBooking: tạo booking mới, kiểm tra tour/số người/ngày và tính tổng tiền.
 async function createBooking(userId, data) {
   const peopleCount = Number(data.peopleCount);
   if (!Number.isInteger(peopleCount) || peopleCount < 1) {
@@ -132,6 +146,7 @@ async function createBooking(userId, data) {
     throw error;
   }
 
+  // Chỉ cho đặt tour đang hoạt động để tránh booking tour đã bị tắt.
   const tour = await prisma.tour.findFirst({
     where: { id: data.tourId, isActive: true },
   });
@@ -149,6 +164,7 @@ async function createBooking(userId, data) {
   const startDate = parseStartDate(data.startDate);
   ensureFutureDate(startDate);
 
+  // Tổng tiền được tính lại ở backend để tránh client tự sửa giá.
   const unitPrice = tour.discountPrice || tour.price;
   const booking = await prisma.booking.create({
     data: {
@@ -169,6 +185,7 @@ async function createBooking(userId, data) {
   return { message: 'Booking created', booking };
 }
 
+// Hàm updateBookingStatus: admin cập nhật trạng thái booking.
 function updateBookingStatus(id, status) {
   return prisma.booking.update({
     where: { id },
@@ -177,6 +194,7 @@ function updateBookingStatus(id, status) {
   });
 }
 
+// Hàm cancelMyBooking: người dùng hủy booking của chính mình khi còn pending.
 async function cancelMyBooking(id, userId) {
   const booking = await prisma.booking.findUnique({ where: { id } });
   if (!booking || booking.userId !== userId) {
@@ -197,6 +215,7 @@ async function cancelMyBooking(id, userId) {
   });
 }
 
+// Hàm deleteBooking: admin xóa booking theo id.
 async function deleteBooking(id) {
   await prisma.booking.delete({ where: { id } });
   return { message: 'Booking deleted' };
@@ -211,3 +230,4 @@ module.exports = {
   cancelMyBooking,
   deleteBooking,
 };
+

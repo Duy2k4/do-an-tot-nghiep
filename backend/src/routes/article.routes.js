@@ -1,3 +1,4 @@
+// Route bài viết: khai báo endpoint, middleware và validation.
 const { Router } = require('express');
 const { body, validationResult } = require('express-validator');
 const articleController = require('../controllers/article.controller');
@@ -5,6 +6,7 @@ const { authenticate, requireAdmin } = require('../middlewares/auth');
 
 const router = Router();
 
+// Hàm validate: kiểm tra lỗi validation từ express-validator trước khi vào controller.
 const validate = (req, res, next) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
@@ -56,3 +58,4 @@ router.delete(
 );
 
 module.exports = router;
+

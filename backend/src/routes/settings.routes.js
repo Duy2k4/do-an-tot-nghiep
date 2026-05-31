@@ -1,3 +1,4 @@
+// Route cài đặt: public đọc cấu hình, admin cập nhật cấu hình website.
 const { Router } = require('express');
 const { body, validationResult } = require('express-validator');
 const settingsController = require('../controllers/settings.controller');
@@ -5,6 +6,7 @@ const { authenticate, requireAdmin } = require('../middlewares/auth');
 
 const router = Router();
 
+// Hàm validate: kiểm tra lỗi validation từ express-validator trước khi vào controller.
 const validate = (req, res, next) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
@@ -26,3 +28,4 @@ router.put('/bulk', authenticate, requireAdmin, settingsController.updateSetting
 router.delete('/:key', authenticate, requireAdmin, settingsController.deleteSetting);
 
 module.exports = router;
+
