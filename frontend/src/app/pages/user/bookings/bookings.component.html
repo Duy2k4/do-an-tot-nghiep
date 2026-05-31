@@ -1,0 +1,47 @@
+<section class="section bookings-section">
+  <div class="container">
+    <div class="user-page-heading">
+      <div>
+        <h1>Booking của tôi</h1>
+      </div>
+      <a routerLink="/tours" class="btn btn-primary">
+        <span class="material-icons">tour</span>
+        Xem tour
+      </a>
+    </div>
+
+    <div class="loading-spinner" *ngIf="loading"><div class="spinner"></div></div>
+    <div class="alert-error" *ngIf="!loading && error">{{ error }}</div>
+
+    <div class="booking-list" *ngIf="!loading && bookings.length">
+      <div class="booking-card fade-in" *ngFor="let b of bookings">
+        <img [src]="getTourImage(b)" [alt]="b.tour?.name">
+        <div class="booking-main">
+          <div class="booking-topline">
+            <span class="booking-code">{{ b.bookingCode }}</span>
+            <span class="status-pill" [class.pending]="b.status === 'pending'" [class.confirmed]="b.status === 'confirmed'" [class.cancelled]="b.status === 'cancelled'">
+              {{ statusLabel(b.status) }}
+            </span>
+          </div>
+          <h3>{{ b.tour?.name }}</h3>
+          <div class="booking-meta">
+            <span><span class="material-icons">event</span> {{ b.startDate | date:'dd/MM/yyyy' }}</span>
+            <span><span class="material-icons">group</span> {{ b.peopleCount }} người</span>
+            <span><span class="material-icons">payments</span> {{ b.totalAmount | number:'1.0-0' }}đ</span>
+          </div>
+        </div>
+        <button class="btn btn-outline-danger" *ngIf="b.status === 'pending'" (click)="cancel(b)">
+          <span class="material-icons">cancel</span>
+          Hủy
+        </button>
+      </div>
+    </div>
+
+    <div class="empty-state booking-empty" *ngIf="!loading && bookings.length === 0">
+      <span class="material-icons">event_busy</span>
+      <h3>Chưa có booking nào</h3>
+      <p>Chọn một tour phù hợp và đặt lịch khởi hành.</p>
+      <a routerLink="/tours" class="btn btn-primary">Xem tour</a>
+    </div>
+  </div>
+</section>

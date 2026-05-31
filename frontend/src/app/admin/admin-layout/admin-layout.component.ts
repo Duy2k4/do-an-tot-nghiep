@@ -33,6 +33,7 @@ export class AdminLayoutComponent implements OnInit {
     users: 'Quản lý người dùng',
     reviews: 'Quản lý đánh giá',
     inquiries: 'Yêu cầu tư vấn',
+    bookings: 'Quản lý booking',
     settings: 'Cài đặt',
   };
 

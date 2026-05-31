@@ -46,6 +46,7 @@ export const routes: Routes = [
       { path: 'profile', loadComponent: () => import('./pages/user/profile/profile.component').then(m => m.ProfileComponent) },
       { path: 'favorites', loadComponent: () => import('./pages/user/favorites/favorites.component').then(m => m.FavoritesComponent) },
       { path: 'inquiries', loadComponent: () => import('./pages/user/inquiries/inquiries.component').then(m => m.InquiriesComponent) },
+      { path: 'bookings', loadComponent: () => import('./pages/user/bookings/bookings.component').then(m => m.UserBookingsComponent) },
     ]
   },
   // Route quản trị
@@ -69,6 +70,7 @@ export const routes: Routes = [
       { path: 'users', loadComponent: () => import('./admin/users/users.component').then(m => m.UsersComponent) },
       { path: 'reviews', loadComponent: () => import('./admin/reviews/reviews.component').then(m => m.ReviewsComponent) },
       { path: 'inquiries', loadComponent: () => import('./admin/inquiries/inquiries.component').then(m => m.AdminInquiriesComponent) },
+      { path: 'bookings', loadComponent: () => import('./admin/bookings/bookings.component').then(m => m.AdminBookingsComponent) },
       { path: 'settings', loadComponent: () => import('./admin/settings/settings.component').then(m => m.SettingsComponent) },
     ]
   },

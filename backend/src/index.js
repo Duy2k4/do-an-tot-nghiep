@@ -20,6 +20,7 @@ const recommendationRoutes = require('./routes/recommendation.routes');
 const uploadRoutes = require('./routes/upload.routes');
 const dashboardRoutes = require('./routes/dashboard.routes');
 const settingsRoutes = require('./routes/settings.routes');
+const bookingRoutes = require('./routes/booking.routes');
 
 const app = express();
 
@@ -57,6 +58,7 @@ app.use('/api/recommendations', recommendationRoutes);
 app.use('/api/upload', uploadRoutes);
 app.use('/api/dashboard', dashboardRoutes);
 app.use('/api/settings', settingsRoutes);
+app.use('/api/bookings', bookingRoutes);
 
 // Xử lý lỗi 404
 app.use((req, res) => {

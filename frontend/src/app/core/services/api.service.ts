@@ -216,6 +216,39 @@ export class ApiService {
     return this.http.delete(`${this.base}/inquiries/${id}`);
   }
 
+  // Đặt tour
+  getBookings(params?: any): Observable<any> {
+    let httpParams = new HttpParams();
+    if (params) {
+      Object.keys(params).forEach(key => {
+        if (params[key] !== null && params[key] !== undefined && params[key] !== '') {
+          httpParams = httpParams.set(key, params[key].toString());
+        }
+      });
+    }
+    return this.http.get(`${this.base}/bookings`, { params: httpParams });
+  }
+
+  getMyBookings(): Observable<any> {
+    return this.http.get(`${this.base}/bookings/my`);
+  }
+
+  createBooking(data: any): Observable<any> {
+    return this.http.post(`${this.base}/bookings`, data);
+  }
+
+  updateBookingStatus(id: string, status: string): Observable<any> {
+    return this.http.patch(`${this.base}/bookings/${id}/status`, { status });
+  }
+
+  cancelBooking(id: string): Observable<any> {
+    return this.http.patch(`${this.base}/bookings/${id}/cancel`, {});
+  }
+
+  deleteBooking(id: string): Observable<any> {
+    return this.http.delete(`${this.base}/bookings/${id}`);
+  }
+
   // Danh mục
   getDestinationCategories(): Observable<any> {
     return this.http.get(`${this.base}/categories/destinations`);

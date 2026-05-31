@@ -7,7 +7,7 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-// ==================== NGƯỜI DÙNG & XÁC THỰC ====================
+// ==================== USER & AUTH ====================
 
 model Role {
   id    String @id @default(uuid())
@@ -36,11 +36,12 @@ model User {
   chatbotHistories  ChatbotHistory[]
   recommendationLogs RecommendationLog[]
   articles         Article[]
+  bookings         Booking[]
 
   @@map("users")
 }
 
-// ==================== ĐIỂM ĐẾN ====================
+// ==================== DESTINATION ====================
 
 model Province {
   id          String        @id @default(uuid())
@@ -167,6 +168,7 @@ model Tour {
   schedules      TourSchedule[]
   reviews        Review[]
   inquiries      Inquiry[]
+  bookings      Booking[]
 
   @@map("tours")
 }
@@ -196,7 +198,7 @@ model TourSchedule {
   @@map("tour_schedules")
 }
 
-// ==================== BÀI VIẾT ====================
+// ==================== ARTICLE ====================
 
 model ArticleCategory {
   id        String    @id @default(uuid())
@@ -245,7 +247,7 @@ model ArticleImage {
   @@map("article_images")
 }
 
-// ==================== ĐÁNH GIÁ ====================
+// ==================== REVIEW ====================
 
 model Review {
   id            String      @id @default(uuid())
@@ -263,7 +265,7 @@ model Review {
   @@map("reviews")
 }
 
-// ==================== YÊU THÍCH ====================
+// ==================== FAVORITE ====================
 
 model Favorite {
   id            String      @id @default(uuid())
@@ -277,7 +279,7 @@ model Favorite {
   @@map("favorites")
 }
 
-// ==================== YÊU CẦU TƯ VẤN ====================
+// ==================== INQUIRY ====================
 
 model Inquiry {
   id          String    @id @default(uuid())
@@ -300,6 +302,34 @@ model Inquiry {
   @@map("inquiries")
 }
 
+
+// ==================== BOOKING ====================
+
+model Booking {
+  id           String   @id @default(uuid())
+  bookingCode  String   @unique
+  userId       String
+  user         User     @relation(fields: [userId], references: [id])
+  tourId       String
+  tour         Tour     @relation(fields: [tourId], references: [id])
+  startDate    DateTime
+  peopleCount  Int
+  totalAmount  Float
+  contactName  String
+  contactEmail String
+  contactPhone String
+  note         String?  @db.Text
+  status       String   @default("pending") // pending, confirmed, cancelled
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@index([userId])
+  @@index([tourId])
+  @@index([status])
+  @@index([startDate])
+  @@map("bookings")
+}
+
 // ==================== CHATBOT ====================
 
 model ChatbotHistory {
@@ -315,7 +345,7 @@ model ChatbotHistory {
   @@map("chatbot_histories")
 }
 
-// ==================== CÀI ĐẶT TRANG ====================
+// ==================== SITE SETTINGS ====================
 
 model SiteSetting {
   id        String   @id @default(uuid())
@@ -331,7 +361,7 @@ model SiteSetting {
   @@map("site_settings")
 }
 
-// ==================== GỢI Ý ====================
+// ==================== RECOMMENDATION ====================
 
 model RecommendationLog {
   id          String   @id @default(uuid())

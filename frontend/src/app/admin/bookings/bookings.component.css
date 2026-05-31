@@ -1,0 +1,56 @@
+.admin-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.toolbar-search {
+  position: relative;
+  flex: 1;
+  min-width: 260px;
+}
+
+.toolbar-search .material-icons {
+  position: absolute;
+  left: 0.875rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--gray);
+  font-size: 1.125rem;
+  pointer-events: none;
+}
+
+.toolbar-search .form-control {
+  padding-left: 2.75rem;
+}
+
+.status-filter { max-width: 210px; }
+.booking-code { color: var(--primary); white-space: nowrap; }
+.muted { color: var(--gray); font-size: 0.875rem; }
+
+.data-table select.form-control {
+  min-width: 140px;
+  padding: 0.35rem 0.5rem;
+  font-size: 0.875rem;
+}
+
+.empty-state {
+  margin-top: 2rem;
+}
+
+@media (max-width: 640px) {
+  .admin-toolbar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .toolbar-search {
+    min-width: 0;
+  }
+
+  .status-filter {
+    max-width: none;
+  }
+}

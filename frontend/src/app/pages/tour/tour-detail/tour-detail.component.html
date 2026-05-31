@@ -52,10 +52,47 @@
               </div>
               <div class="info-row"><span class="material-icons">schedule</span> {{ tour.duration }}</div>
               <div class="info-row"><span class="material-icons">group</span> Tối đa {{ tour.maxPeople }} người</div>
-              <button class="btn btn-accent btn-lg" style="width:100%;" routerLink="/contact">
-                <span class="material-icons">support_agent</span>
-                Yêu cầu đặt tour
-              </button>
+              <form class="booking-form" (ngSubmit)="submitBooking()">
+                <div class="form-group">
+                  <label>Ngày khởi hành</label>
+                  <input type="date" class="form-control" [(ngModel)]="bookingForm.startDate" name="startDate" [min]="minStartDate" [class.is-invalid]="bookingFieldErrors['startDate']" required>
+                  <span class="field-error" *ngIf="bookingFieldErrors['startDate']">{{ bookingFieldErrors['startDate'] }}</span>
+                </div>
+                <div class="form-group">
+                  <label>Số người</label>
+                  <input type="number" class="form-control" [(ngModel)]="bookingForm.peopleCount" name="peopleCount" min="1" [max]="tour.maxPeople" [class.is-invalid]="bookingFieldErrors['peopleCount']" required>
+                  <span class="field-error" *ngIf="bookingFieldErrors['peopleCount']">{{ bookingFieldErrors['peopleCount'] }}</span>
+                </div>
+                <div class="form-group">
+                  <label>Họ tên liên hệ</label>
+                  <input type="text" class="form-control" [(ngModel)]="bookingForm.contactName" name="contactName" [class.is-invalid]="bookingFieldErrors['contactName']" required>
+                  <span class="field-error" *ngIf="bookingFieldErrors['contactName']">{{ bookingFieldErrors['contactName'] }}</span>
+                </div>
+                <div class="form-group">
+                  <label>Email</label>
+                  <input type="email" class="form-control" [(ngModel)]="bookingForm.contactEmail" name="contactEmail" [class.is-invalid]="bookingFieldErrors['contactEmail']" required>
+                  <span class="field-error" *ngIf="bookingFieldErrors['contactEmail']">{{ bookingFieldErrors['contactEmail'] }}</span>
+                </div>
+                <div class="form-group">
+                  <label>Số điện thoại</label>
+                  <input type="tel" class="form-control" [(ngModel)]="bookingForm.contactPhone" name="contactPhone" [class.is-invalid]="bookingFieldErrors['contactPhone']" required>
+                  <span class="field-error" *ngIf="bookingFieldErrors['contactPhone']">{{ bookingFieldErrors['contactPhone'] }}</span>
+                </div>
+                <div class="form-group">
+                  <label>Ghi chú</label>
+                  <textarea class="form-control" [(ngModel)]="bookingForm.note" name="note" rows="3"></textarea>
+                </div>
+                <div class="booking-total">
+                  <span>Tạm tính</span>
+                  <strong>{{ estimatedTotal | number:'1.0-0' }}đ</strong>
+                </div>
+                <div class="alert-success" *ngIf="bookingSuccess">{{ bookingSuccess }}</div>
+                <div class="alert-error" *ngIf="bookingError">{{ bookingError }}</div>
+                <button class="btn btn-accent btn-lg" type="submit" style="width:100%;" [disabled]="bookingLoading">
+                  <span class="material-icons">event_available</span>
+                  {{ bookingLoading ? 'Đang đặt...' : 'Đặt tour' }}
+                </button>
+              </form>
               <a class="btn btn-outline" style="width:100%;margin-top:0.5rem;" routerLink="/contact">
                 <span class="material-icons">chat</span>
                 Tư vấn thêm

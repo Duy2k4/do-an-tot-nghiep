@@ -1,0 +1,65 @@
+<section class="section">
+  <div class="container">
+    <div class="admin-toolbar">
+      <div class="toolbar-search">
+        <span class="material-icons">search</span>
+        <input type="text" class="form-control" [(ngModel)]="search" (ngModelChange)="page = 1; load()" placeholder="Tìm mã booking, khách hàng, tour...">
+      </div>
+      <select class="form-control status-filter" [(ngModel)]="filterStatus" (change)="page = 1; load()">
+        <option value="">Tất cả trạng thái</option>
+        <option value="pending">Chờ xác nhận</option>
+        <option value="confirmed">Đã xác nhận</option>
+        <option value="cancelled">Đã hủy</option>
+      </select>
+    </div>
+
+    <div class="loading-spinner" *ngIf="loading"><div class="spinner"></div></div>
+
+    <div class="data-table-wrapper" *ngIf="!loading && data.length > 0">
+      <table class="data-table">
+        <thead>
+          <tr><th>Mã</th><th>Khách hàng</th><th>Tour</th><th>Khởi hành</th><th>Số người</th><th>Tổng tiền</th><th>Trạng thái</th><th>Hành động</th></tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let b of data">
+            <td><strong class="booking-code">{{ b.bookingCode }}</strong></td>
+            <td>
+              <strong>{{ b.contactName }}</strong><br>
+              <span class="muted">{{ b.contactPhone }}</span>
+            </td>
+            <td style="max-width:220px;">{{ b.tour?.name }}</td>
+            <td>{{ b.startDate | date:'dd/MM/yyyy' }}</td>
+            <td>{{ b.peopleCount }}</td>
+            <td><strong>{{ b.totalAmount | number:'1.0-0' }}đ</strong></td>
+            <td>
+              <select class="form-control" [(ngModel)]="b.status" (change)="updateStatus(b)">
+                <option value="pending">Chờ xác nhận</option>
+                <option value="confirmed">Đã xác nhận</option>
+                <option value="cancelled">Đã hủy</option>
+              </select>
+            </td>
+            <td>
+              <button type="button" class="btn btn-sm btn-danger" (click)="delete(b.id)" title="Xóa" aria-label="Xóa">
+                <span class="material-icons">delete</span>
+              </button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="empty-state" *ngIf="!loading && data.length === 0">
+      <span class="material-icons">event_busy</span>
+      <h3>Không có booking</h3>
+    </div>
+
+    <div class="pagination-wrapper" *ngIf="!loading && totalPages > 1">
+      <div class="pagination-info">Hiển thị {{ data.length }} / {{ total }} booking</div>
+      <div class="pagination">
+        <button *ngFor="let p of pageNumbers" [class.active]="p === page" [class.ellipsis]="p === '...'" (click)="goTo(p)" [disabled]="p === '...'">
+          {{ p }}
+        </button>
+      </div>
+    </div>
+  </div>
+</section>
