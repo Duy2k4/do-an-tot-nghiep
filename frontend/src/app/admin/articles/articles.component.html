@@ -14,7 +14,7 @@
         <thead><tr><th>Ảnh</th><th>Tiêu đề</th><th>Danh mục</th><th>Lượt xem</th><th>Trạng thái</th><th>Hành động</th></tr></thead>
         <tbody>
           <tr *ngFor="let a of data">
-            <td><img [src]="a.imageUrl ? api.mediaUrl(a.imageUrl) : 'https://picsum.photos/seed/' + a.slug + '/60/60'" alt="" style="width:50px;height:50px;object-fit:cover;border-radius:8px;"></td>
+            <td><img [src]="a.images?.[0]?.url ? api.mediaUrl(a.images[0].url) : (a.imageUrl ? api.mediaUrl(a.imageUrl) : 'https://picsum.photos/seed/' + a.slug + '/60/60')" alt="" style="width:50px;height:50px;object-fit:cover;border-radius:8px;"></td>
             <td><strong style="display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;max-width:300px;">{{ a.title }}</strong></td>
             <td><span class="badge badge-primary">{{ a.category?.name }}</span></td>
             <td><span class="material-icons" style="font-size:0.875rem;vertical-align:middle;color:var(--gray);">visibility</span> {{ a.viewCount }}</td>

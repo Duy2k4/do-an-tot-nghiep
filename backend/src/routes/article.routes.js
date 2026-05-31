@@ -202,7 +202,7 @@ router.post('/', authenticate, requireAdmin, [
       data: {
         ...articleData,
         slug: inputSlug || generateSlug(articleData.title || 'article'),
-        authorId: req.user.id,
+        author: req.user.id ? {connect: {id: req.user.id}}: undefined,
         publishedAt: data.isPublished ? new Date() : null,
         images: cleanedImages && cleanedImages.length > 0 ? {
           create: cleanedImages,
