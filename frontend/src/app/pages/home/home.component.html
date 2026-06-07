@@ -196,7 +196,7 @@
     <div class="grid grid-3" *ngIf="!loadingArticles">
       <a *ngFor="let a of recentArticles" [routerLink]="['/articles', a.slug]" class="card article-card-home fade-in">
         <div class="card-image" style="height:200px;">
-          <img [src]="a.imageUrl || 'https://picsum.photos/seed/' + a.slug + '/400/250'" [alt]="a.title">
+          <img [src]="getArticleImage(a)" [alt]="a.title">
           <div class="card-img-overlay">
             <span class="overlay-text"><span class="material-icons">menu_book</span> Đọc ngay</span>
           </div>

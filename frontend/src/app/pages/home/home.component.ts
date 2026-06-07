@@ -71,6 +71,19 @@ export class HomeComponent implements OnInit {
     window.location.href = '/contact';
   }
 
+    getArticleImage(article: any): string {
+    if (article?.images?.length) {
+      const primary = article.images.find((img: any) => img.isPrimary);
+      const imageUrl = primary?.url || article.images[0]?.url;
+      return this.api.mediaUrl(imageUrl);
+    }
+
+    if (article?.imageUrl) {
+      return this.api.mediaUrl(article.imageUrl);
+    }
+
+    return `https://picsum.photos/seed/${article?.slug || 'article'}/400/250`;
+  }
   validateContact(): boolean {
     this.contactErrors = {};
     if (!this.contactName.trim()) {
