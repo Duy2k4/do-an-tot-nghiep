@@ -43,7 +43,7 @@
             </div>
           </ng-container>
           <!-- Một ảnh hoặc ảnh dự phòng -->
-          <ng-container *ngIf]="!a.images || a.images.length <= 1">
+          <ng-container *ngIf="!a.images || a.images.length <= 1">
             <img [src]="getArticleImage(a)" [alt]="a.title">
           </ng-container>
           <span class="badge badge-primary card-badge-top">{{ a.category?.name }}</span>
