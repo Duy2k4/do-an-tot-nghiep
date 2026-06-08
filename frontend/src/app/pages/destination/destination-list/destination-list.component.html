@@ -10,19 +10,20 @@
     <div class="filters-bar">
       <div class="filter-search">
         <span class="material-icons">search</span>
-        <input type="text" [(ngModel)]="filters.search" (ngModelChange)="onSearchChange()" placeholder="Tìm kiếm địa điểm..." class="search-input">
+        <input type="text" [(ngModel)]="filters.search" (ngModelChange)="onSearchChange()"
+          placeholder="Tìm kiếm địa điểm..." class="search-input">
       </div>
       <div class="filter-chips">
         <div class="chip-group">
           <span class="material-icons chip-icon">category</span>
-          <select class="chip-select" [(ngModel)]="filters.category" (change)="loadDestinations()">
+          <select class="chip-select" [(ngModel)]="filters.category" (change)="loadDestinations(1)">
             <option value="">Tất cả loại hình</option>
             <option *ngFor="let c of categories" [value]="c.slug">{{ c.name }}</option>
           </select>
         </div>
         <div class="chip-group">
           <span class="material-icons chip-icon">public</span>
-          <select class="chip-select" [(ngModel)]="filters.region" (change)="loadDestinations()">
+          <select class="chip-select" [(ngModel)]="filters.region" (change)="loadDestinations(1)">
             <option value="">Tất cả vùng miền</option>
             <option value="NORTH">Miền Bắc</option>
             <option value="CENTRAL">Miền Trung</option>
@@ -31,7 +32,7 @@
         </div>
         <div class="chip-group">
           <span class="material-icons chip-icon">sort</span>
-          <select class="chip-select" [(ngModel)]="filters.sort" (change)="loadDestinations()">
+          <select class="chip-select" [(ngModel)]="filters.sort" (change)="loadDestinations(1)">
             <option value="createdAt">Mới nhất</option>
             <option value="rating">Đánh giá cao</option>
             <option value="reviewCount">Nhiều đánh giá</option>
@@ -75,7 +76,7 @@
               <span class="material-icons stars">star</span>
               <span class="count">({{ d.reviewCount }})</span>
             </div>
-          
+
           </div>
         </div>
       </a>
@@ -91,7 +92,8 @@
       <button [disabled]="pagination.page <= 1" (click)="goToPage(pagination.page - 1)">
         <span class="material-icons">chevron_left</span>
       </button>
-      <button *ngFor="let p of pageNumbers" [class.active]="p === pagination.page" (click)="goToPage(p)">{{ p }}</button>
+      <button *ngFor="let p of pageNumbers" [class.active]="p === pagination.page" (click)="goToPage(p)">{{ p
+        }}</button>
       <button [disabled]="pagination.page >= pagination.totalPages" (click)="goToPage(pagination.page + 1)">
         <span class="material-icons">chevron_right</span>
       </button>
