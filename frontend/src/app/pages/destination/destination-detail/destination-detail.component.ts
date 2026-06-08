@@ -65,6 +65,12 @@ export class DestinationDetailComponent implements OnInit {
     }
   }
 
+  get visibleReviews():any[]{
+    if(!this.userReview?.id) return this.reviews;
+    return this.reviews.filter((r:any) => r.id !==this.userReview.id);
+
+  }
+
   getHighlights(): string[] {
     if (!this.destination?.highlights) return [];
     try { return JSON.parse(this.destination.highlights); } catch { return []; }
@@ -207,4 +213,5 @@ export class DestinationDetailComponent implements OnInit {
       }
     });
   }
+
 }
