@@ -24,6 +24,8 @@ export class DestinationDetailComponent implements OnInit {
   reviewSuccess = false;
   userReview: any = null;
   isEditingReview = false;
+  reviewSubmitted = false;
+  reviewError = '';
 
   constructor(
     private api: ApiService,
@@ -87,26 +89,61 @@ export class DestinationDetailComponent implements OnInit {
   checkFavorite() {
     this.api.checkFavorite(this.destination.id).subscribe((res) => { this.isFavorite = res.isFavorite; });
   }
-  reviewError = '';
+
+  setReviewRating(rating: number) {
+    this.newReview.rating = rating;
+    if (this.reviewSubmitted) this.validateReview();
+  }
+
+  onReviewCommentChange() {
+    if (this.reviewSubmitted) this.validateReview();
+  }
+
+  isReviewCommentInvalid(): boolean {
+    const comment = this.newReview.comment?.trim() || '';
+    return this.reviewSubmitted && (comment.length === 0 || comment.length < 10);
+  }
+
+  canSubmitReview(): boolean {
+    return !!this.newReview.rating && (this.newReview.comment?.trim() || '').length >= 10;
+  }
+
+  validateReview(): boolean {
+    this.reviewError = '';
+    if (!this.newReview.rating) {
+      this.reviewError = 'Vui lòng chọn số sao';
+      return false;
+    }
+
+    const comment = this.newReview.comment?.trim() || '';
+    if (!comment) {
+      this.reviewError = 'Vui lòng nhập nội dung đánh giá';
+      return false;
+    }
+
+    if (comment.length < 10) {
+      this.reviewError = 'Nội dung đánh giá ít nhất 10 ký tự';
+      return false;
+    }
+
+    return true;
+  }
 
   submitReview() {
-    this.reviewError = '';
-    if (!this.newReview.rating) { this.reviewError = 'Vui lòng chọn số sao'; return; }
-    if (!this.newReview.comment.trim()) {
-      this.reviewError = 'Vui lòng nhập nội dung đánh giá'; return;
-    } else if (this.newReview.comment.trim().length < 10) {
-      this.reviewError = 'Nội dung đánh giá ít nhất 10 ký tự'; return;
-    }
+    this.reviewSubmitted = true;
+    if (!this.validateReview()) return;
+
     this.api.createReview({
       destinationId: this.destination.id,
       rating: this.newReview.rating,
-      comment: this.newReview.comment,
+      comment: this.newReview.comment.trim(),
     }).subscribe({
       next: (res) => {
         this.reviews.unshift(res);
         this.userReview = res;
         this.newReview = { rating: 0, comment: '' };
         this.isEditingReview = false;
+        this.reviewSubmitted = false;
         this.reviewSuccess = true;
         setTimeout(() => this.reviewSuccess = false, 3000);
       }
@@ -114,34 +151,40 @@ export class DestinationDetailComponent implements OnInit {
   }
 
   editReview() {
+    if (!this.userReview) return;
+
+    this.newReview = {
+      rating: this.userReview.rating,
+      comment: this.userReview.comment || '',
+    };
     this.isEditingReview = true;
+    this.reviewSubmitted = false;
+    this.reviewError = '';
   }
 
   cancelEdit() {
     this.isEditingReview = false;
+    this.reviewSubmitted = false;
+    this.reviewError = '';
     if (this.userReview) {
       this.newReview = { rating: this.userReview.rating, comment: this.userReview.comment };
     }
   }
 
   saveReview() {
-    this.reviewError = '';
-    if (!this.newReview.rating) { this.reviewError = 'Vui lòng chọn số sao'; return; }
-    if (!this.newReview.comment.trim()) {
-      this.reviewError = 'Vui lòng nhập nội dung đánh giá'; return;
-    } else if (this.newReview.comment.trim().length < 10) {
-      this.reviewError = 'Nội dung đánh giá ít nhất 10 ký tự'; return;
-    }
-    this.api.createReview({
-      destinationId: this.destination.id,
+    this.reviewSubmitted = true;
+    if (!this.validateReview()) return;
+
+    this.api.updateReview(this.userReview.id, {
       rating: this.newReview.rating,
-      comment: this.newReview.comment,
+      comment: this.newReview.comment.trim(),
     }).subscribe({
       next: (res) => {
         const idx = this.reviews.findIndex((r: any) => r.id === this.userReview.id);
         if (idx !== -1) this.reviews[idx] = res;
         this.userReview = res;
         this.isEditingReview = false;
+        this.reviewSubmitted = false;
         this.reviewSuccess = true;
         setTimeout(() => this.reviewSuccess = false, 3000);
       }
@@ -159,6 +202,8 @@ export class DestinationDetailComponent implements OnInit {
         this.userReview = null;
         this.newReview = { rating: 0, comment: '' };
         this.isEditingReview = false;
+        this.reviewSubmitted = false;
+        this.reviewError = '';
       }
     });
   }

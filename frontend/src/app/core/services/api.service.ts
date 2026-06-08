@@ -168,6 +168,10 @@ export class ApiService {
     return this.http.post(`${this.base}/reviews`, data);
   }
 
+ updateReview(id: string, data: any): Observable<any> {
+    return this.http.put(`${this.base}/reviews/${id}`, data);
+  }
+
   deleteReview(id: string): Observable<any> {
     return this.http.delete(`${this.base}/reviews/${id}`);
   }
