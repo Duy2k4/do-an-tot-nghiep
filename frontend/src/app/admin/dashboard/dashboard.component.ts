@@ -16,9 +16,10 @@ export class DashboardComponent implements OnInit {
   Highcharts: typeof Highcharts = Highcharts;
 
   stats: any = null;
+  loading = true;
   recentInquiries: any[] = [];
   topDestinations: any[] = [];
-  inquiryStats: any = null;
+  inquiryStats: any = { pending: 0, replied: 0, closed: 0 };
 
   lineChartOptions: Highcharts.Options = {};
   columnChartOptions: Highcharts.Options = {};
@@ -31,43 +32,43 @@ export class DashboardComponent implements OnInit {
   constructor(private api: ApiService) {}
 
   ngOnInit() {
+    this.initChartOptions();
+    this.loadDashboard();
+  }
+
+  loadDashboard() {
+    this.loading = true;
     this.api.getDashboard().subscribe({
       next: (data: any) => {
-        this.stats = data.stats;
+        this.stats = data.stats || this.emptyStats();
         this.recentInquiries = data.recentInquiries || [];
         this.topDestinations = data.topDestinations || [];
+        this.inquiryStats = {
+          pending: data.inquiryStats?.pending || 0,
+          replied: data.inquiryStats?.replied || 0,
+          closed: data.inquiryStats?.closed || 0,
+        };
 
-        this.initChartOptions();
-
-        if (data.monthlyStats && data.monthlyStats.length > 0) {
+        if (data.monthlyStats?.length) {
           this.updateLineChart(data.monthlyStats);
         }
-        if (data.topDestinations && data.topDestinations.length > 0) {
+        if (data.topDestinations?.length) {
           this.updateColumnChart(data.topDestinations);
         }
+        this.updatePieChart();
+        this.loading = false;
       },
       error: (err) => {
         console.error('Dashboard API error:', err);
-        this.stats = { destinations: 0, tours: 0, articles: 0, users: 0, reviews: 0, pendingInquiries: 0, activeUsers: 0 };
-        this.initChartOptions();
+        this.stats = this.emptyStats();
+        this.updatePieChart();
+        this.loading = false;
       }
     });
+  }
 
-    this.api.getInquiries().subscribe({
-      next: (res: any) => {
-        const data = res.data || [];
-        this.inquiryStats = {
-          pending: data.filter((i: any) => i.status === 'pending').length,
-          replied: data.filter((i: any) => i.status === 'replied').length,
-          closed: data.filter((i: any) => i.status === 'closed').length,
-        };
-        if (!this.pieChartOptions || !this.pieChartOptions.series) {
-          this.initChartOptions();
-        }
-        this.updatePieChart();
-      },
-      error: (err) => console.error('Inquiries API error:', err)
-    });
+  emptyStats() {
+    return { destinations: 0, tours: 0, articles: 0, users: 0, reviews: 0, pendingInquiries: 0, activeUsers: 0 };
   }
 
   initChartOptions() {

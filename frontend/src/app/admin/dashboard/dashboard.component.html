@@ -1,4 +1,4 @@
-<div *ngIf="stats" class="fade-in">
+<div *ngIf="!loading && stats" class="fade-in">
   <h2 style="margin-bottom:1.5rem;">Dashboard</h2>
 
   <!-- Hàng thống kê -->
@@ -43,18 +43,12 @@
   <!-- Hàng biểu đồ -->
   <div class="grid grid-2" style="margin-bottom:2rem;">
     <div class="card chart-card">
-      <highcharts-chart
-        [Highcharts]="Highcharts"
-        [options]="lineChartOptions"
-        [update]="lineChartUpdateFlag"
+      <highcharts-chart [Highcharts]="Highcharts" [options]="lineChartOptions" [update]="lineChartUpdateFlag"
         style="width:100%;display:block;">
       </highcharts-chart>
     </div>
     <div class="card chart-card">
-      <highcharts-chart
-        [Highcharts]="Highcharts"
-        [options]="columnChartOptions"
-        [update]="columnChartUpdateFlag"
+      <highcharts-chart [Highcharts]="Highcharts" [options]="columnChartOptions" [update]="columnChartUpdateFlag"
         style="width:100%;display:block;">
       </highcharts-chart>
     </div>
@@ -63,10 +57,7 @@
   <!-- Hàng dưới -->
   <div class="grid grid-2" style="margin-bottom:2rem;">
     <div class="card chart-card">
-      <highcharts-chart
-        [Highcharts]="Highcharts"
-        [options]="pieChartOptions"
-        [update]="pieChartUpdateFlag"
+      <highcharts-chart [Highcharts]="Highcharts" [options]="pieChartOptions" [update]="pieChartUpdateFlag"
         style="width:100%;display:block;">
       </highcharts-chart>
     </div>
@@ -75,7 +66,8 @@
         <h3>Yêu cầu gần đây</h3>
         <div *ngFor="let i of recentInquiries" class="mini-item">
           <div><strong>{{ i.name }}</strong> - {{ i.subject }}</div>
-          <span class="badge" [class.badge-warning]="i.status==='pending'" [class.badge-success]="i.status==='replied'">{{ i.status }}</span>
+          <span class="badge" [class.badge-warning]="i.status==='pending'"
+            [class.badge-success]="i.status==='replied'">{{ i.status }}</span>
         </div>
         <div *ngIf="recentInquiries.length === 0" class="empty-mini">
           <span class="material-icons">inbox</span>
@@ -85,4 +77,6 @@
     </div>
   </div>
 </div>
-<div class="loading-spinner" *ngIf="!stats"><div class="spinner"></div></div>
+<div class="loading-spinner" *ngIf="loading">
+  <div class="spinner"></div>
+</div>
