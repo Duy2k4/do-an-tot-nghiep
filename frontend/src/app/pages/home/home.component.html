@@ -94,7 +94,8 @@
       <div class="spinner"></div>
     </div>
     <div class="grid grid-4" *ngIf="!loadingDestinations">
-      <a *ngFor="let d of featuredDestinations" [routerLink]="['/destinations', d.slug]" class="card dest-card-home fade-in">
+      <a *ngFor="let d of featuredDestinations" [routerLink]="['/destinations', d.slug]"
+        class="card dest-card-home fade-in">
         <div class="card-image" style="height:220px;">
           <img [src]="d.images[0]?.url || 'https://picsum.photos/seed/' + d.slug + '/400/300'" [alt]="d.name">
           <div class="card-img-overlay">
@@ -146,7 +147,9 @@
     <div class="grid grid-3" *ngIf="!loadingTours">
       <div *ngFor="let t of featuredTours" class="card tour-card-home fade-in">
         <div class="card-image" style="height:200px;">
-          <img [src]="t.images?.[0]?.url ? api.mediaUrl(t.images[0].url) : (t.imageUrl ? api.mediaUrl(t.imageUrl) : 'https://picsum.photos/seed/' + t.slug + '/400/300')" [alt]="t.name">
+          <img
+            [src]="t.images?.[0]?.url ? api.mediaUrl(t.images[0].url) : (t.imageUrl ? api.mediaUrl(t.imageUrl) : 'https://picsum.photos/seed/' + t.slug + '/400/300')"
+            [alt]="t.name">
           <div class="card-img-overlay">
             <span class="overlay-text"><span class="material-icons">explore</span> Xem chi tiết</span>
           </div>
@@ -207,7 +210,8 @@
           <p class="card-excerpt">{{ a.excerpt }}</p>
           <div class="card-meta">
             <span class="material-icons">visibility</span> {{ a.viewCount | number }}
-            <span class="material-icons" style="margin-left:0.75rem;">calendar_today</span> {{ a.publishedAt | date:'dd/MM/yyyy' }}
+            <span class="material-icons" style="margin-left:0.75rem;">calendar_today</span> {{ a.publishedAt |
+            date:'dd/MM/yyyy' }}
           </div>
         </div>
       </a>
@@ -221,7 +225,7 @@
   </div>
 </section>
 
-<!-- Lời kêu gọi gợi ý AI -->
+<!-- gợi ý AI -->
 <section class="ai-cta">
   <div class="container">
     <div class="ai-cta-card">
@@ -231,7 +235,8 @@
           <span>Powered by AI</span>
         </div>
         <h2>Khám phá điểm đến<br>phù hợp với <span>chính bạn</span></h2>
-        <p>Trả lời vài câu hỏi đơn giản, AI sẽ phân tích và gợi ý những địa điểm du lịch phù hợp nhất với sở thích của bạn.</p>
+        <p>Trả lời vài câu hỏi đơn giản, AI sẽ phân tích và gợi ý những địa điểm du lịch phù hợp nhất với sở thích của
+          bạn.</p>
         <div class="ai-features">
           <div class="ai-feat">
             <span class="material-icons">psychology</span>
@@ -286,16 +291,19 @@
       <div class="contact-form">
         <div class="grid grid-2">
           <div>
-            <input type="text" class="form-control" [(ngModel)]="contactName" placeholder="Họ tên của bạn" [class.is-invalid]="contactErrors.name">
+            <input type="text" class="form-control" [(ngModel)]="contactName" placeholder="Họ tên của bạn"
+              [class.is-invalid]="contactErrors.name">
             <span class="field-error" *ngIf="contactErrors.name">{{ contactErrors.name }}</span>
           </div>
           <div>
-            <input type="email" class="form-control" [(ngModel)]="contactEmail" placeholder="Email của bạn" [class.is-invalid]="contactErrors.email">
+            <input type="email" class="form-control" [(ngModel)]="contactEmail" placeholder="Email của bạn"
+              [class.is-invalid]="contactErrors.email">
             <span class="field-error" *ngIf="contactErrors.email">{{ contactErrors.email }}</span>
           </div>
         </div>
         <div>
-          <textarea class="form-control" [(ngModel)]="contactMessage" placeholder="Bạn cần tư vấn về..." [class.is-invalid]="contactErrors.message"></textarea>
+          <textarea class="form-control" [(ngModel)]="contactMessage" placeholder="Bạn cần tư vấn về..."
+            [class.is-invalid]="contactErrors.message"></textarea>
           <span class="field-error" *ngIf="contactErrors.message">{{ contactErrors.message }}</span>
         </div>
         <button class="btn btn-primary btn-lg" (click)="submitQuickContact()">

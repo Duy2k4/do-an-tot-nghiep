@@ -1294,21 +1294,14 @@ textarea.form-control {
   background-size: 20px 20px;
 }
 
-/* ==================== LỜI KÊU GỌI AI ==================== */
+/* ====================  GỢI Ý AI ==================== */
 .ai-cta {
   background: var(--primary);
   padding: 5rem 0;
   position: relative;
   overflow: hidden;
 
-  &::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background: var(--primary);
-    opacity: 0.15;
-    z-index: 1;
-  }
+
 
   .ai-cta-card {
     position: relative;
