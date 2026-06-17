@@ -16,27 +16,36 @@ export class RecommendationComponent implements OnInit {
   loading = false;
   results: any = null;
   preferences: any = {};
+  categories: any[] = [];
+  selectedCategories = new Set<string>();
 
   constructor(private api: ApiService, public auth: AuthService) {}
 
-  ngOnInit() {}
+  ngOnInit() {
+    this.api.getDestinationCategories().subscribe({
+      next: (data: any) => { this.categories = data; }
+    });
+  }
+
+  toggleCategory(slug: string) {
+    if (this.selectedCategories.has(slug)) {
+      this.selectedCategories.delete(slug);
+    } else {
+      this.selectedCategories.add(slug);
+    }
+  }
 
   getRecommendations() {
     this.loading = true;
     const prefs: any = {};
     const regions: string[] = [];
-    const categories: string[] = [];
 
     if (this.preferences.north) regions.push('NORTH');
     if (this.preferences.central) regions.push('CENTRAL');
     if (this.preferences.south) regions.push('SOUTH');
-    if (this.preferences.beach) categories.push('bien-dao');
-    if (this.preferences.mountain) categories.push('nui-rung');
-    if (this.preferences.historic) categories.push('di-san');
-    if (this.preferences.nature) categories.push('thien-nhien');
 
     if (regions.length) prefs.regions = regions;
-    if (categories.length) prefs.categories = categories;
+    if (this.selectedCategories.size > 0) prefs.categories = Array.from(this.selectedCategories);
     if (this.preferences.budget) prefs.budget = this.preferences.budget;
 
     this.api.getRecommendations(prefs).subscribe({

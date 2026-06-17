@@ -29,17 +29,8 @@
         <div class="pref-section">
           <label><span class="material-icons">category</span> Loại hình</label>
           <div class="chip-choices">
-            <button class="choice-chip" [class.active]="preferences.beach" (click)="preferences.beach = !preferences.beach">
-              <span class="material-icons">beach_access</span> Biển & Đảo
-            </button>
-            <button class="choice-chip" [class.active]="preferences.mountain" (click)="preferences.mountain = !preferences.mountain">
-              <span class="material-icons">landscape</span> Núi & Rừng
-            </button>
-            <button class="choice-chip" [class.active]="preferences.historic" (click)="preferences.historic = !preferences.historic">
-              <span class="material-icons">account_balance</span> Di Sản
-            </button>
-            <button class="choice-chip" [class.active]="preferences.nature" (click)="preferences.nature = !preferences.nature">
-              <span class="material-icons">park</span> Thiên Nhiên
+            <button *ngFor="let c of categories" class="choice-chip" [class.active]="selectedCategories.has(c.slug)" (click)="toggleCategory(c.slug)">
+              <span class="material-icons">place</span> {{c.name}}
             </button>
           </div>
         </div>

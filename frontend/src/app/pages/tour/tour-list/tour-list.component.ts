@@ -16,27 +16,33 @@ export class TourListComponent implements OnInit {
   loading = true;
   search = '';
   sort = 'createdAt';
-  pagination: any = { page: 1, limit: 12, total: 0, totalPages: 0 };
+  pagination: any = { page: 1, limit: 6, total: 0, totalPages: 0 };
   pageNumbers: number[] = [];
 
   constructor(public api: ApiService) {}
 
   ngOnInit() { this.loadTours(); }
 
-  loadTours() {
+  loadTours(page = this.pagination.page) {
     this.loading = true;
-    this.pagination.page = 1;
-    const params: any = { page: 1, limit: 12, sort: this.sort };
+    this.pagination.page = page;
+    const params: any = { page, limit: this.pagination.limit, sort: this.sort };
     if (this.search) params.search = this.search;
     this.api.getTours(params).subscribe({
       next: (res) => {
         this.tours = res.data;
         this.pagination = res.pagination;
-        this.pageNumbers = Array.from({length: Math.min(5, res.pagination.totalPages)}, (_, i) => i + 1);
+        this.pageNumbers = this.getPageNumbers(res.pagination.page, res.pagination.totalPages);
         this.loading = false;
       },
       error: () => { this.loading = false; }
     });
+  }
+
+  getPageNumbers(current: number, totalPages: number): number[] {
+    const visibleCount = Math.min(5, totalPages);
+    const start = Math.max(1, Math.min(current - 2, totalPages - visibleCount + 1));
+    return Array.from({ length: visibleCount }, (_, i) => start + i);
   }
 
   getDiscount(t: any): number {
@@ -45,7 +51,8 @@ export class TourListComponent implements OnInit {
   }
 
   goToPage(page: number) {
-    this.pagination.page = page;
-    this.loadTours();
+    if (page < 1 || page > this.pagination.totalPages || page === this.pagination.page) return;
+    this.loadTours(page);
+    window.scrollTo({ top: 300, behavior: 'smooth' });
   }
 }

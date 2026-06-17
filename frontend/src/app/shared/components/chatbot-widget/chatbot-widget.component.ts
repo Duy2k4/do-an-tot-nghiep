@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { RouterModule } from '@angular/router';
+import { Router, RouterModule } from '@angular/router';
 import { ApiService } from '../../../core/services/api.service';
 import { AuthService } from '../../../core/services/auth.service';
 
@@ -35,10 +35,20 @@ export class ChatbotWidgetComponent {
     { label: 'Địa điểm lãng mạn', icon: 'favorite', query: 'Địa điểm lãng mạn cho cặp đôi' },
   ];
 
-  constructor(private api: ApiService, public auth: AuthService) {}
+  constructor(private api: ApiService, public auth: AuthService, private router: Router) {}
+
+  navigateToCard(slug: string) {
+    this.isOpen = false;
+    setTimeout(() => {
+      this.router.navigate(['/destinations', slug]);
+    }, 100);
+  }
 
   toggleWindow() {
     this.isOpen = !this.isOpen;
+    if (this.isOpen && this.messages.length > 0) {
+      setTimeout(() => this.scrollToBottom(), 150);
+    }
   }
 
   sendMessage() {

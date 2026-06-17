@@ -6,10 +6,38 @@ require('dotenv').config({ override: true });
 const DEEPSEEK_MODEL = 'deepseek-v4-flash';
 const DEEPSEEK_API_URL = 'https://api.deepseek.com/v1/chat/completions';
 
+// Map tên vùng miền sang enum trong DB (hỗ trợ cả tên tiếng Việt và enum)
+const REGION_MAP = {
+  'Miền Bắc': 'NORTH',
+  'Miền Trung': 'CENTRAL',
+  'Miền Nam': 'SOUTH',
+  'NORTH': 'NORTH',
+  'CENTRAL': 'CENTRAL',
+  'SOUTH': 'SOUTH',
+};
+
 // Hàm buildDestinationContext: lấy và rút gọn dữ liệu điểm đến làm input cho AI gợi ý.
-async function buildDestinationContext(limit = 30) {
+// Nếu có filters (regions, categories), sẽ lọc trước khi gửi cho AI.
+async function buildDestinationContext(filters = {}, limit = 30) {
+  const where = { isActive: true };
+
+  // Lọc theo vùng miền nếu user chọn
+  if (filters.regions && filters.regions.length > 0) {
+    const dbRegions = filters.regions
+      .map(r => REGION_MAP[r])
+      .filter(Boolean);
+    if (dbRegions.length > 0) {
+      where.province = { region: { in: dbRegions } };
+    }
+  }
+
+  // Lọc theo danh mục nếu user chọn
+  if (filters.categories && filters.categories.length > 0) {
+    where.category = { slug: { in: filters.categories } };
+  }
+
   const destinations = await prisma.destination.findMany({
-    where: { isActive: true },
+    where,
     include: {
       province: { select: { name: true, region: true } },
       category: { select: { name: true, slug: true } },
@@ -94,7 +122,7 @@ function buildPreferenceSummary(preferences) {
 // Hàm getRecommendations: gọi AI gợi ý, enrich dữ liệu điểm đến và ghi log.
 async function getRecommendations(preferences = {}, userId = null) {
   const sessionId = uuidv4();
-  const destinations = await buildDestinationContext(30);
+  const destinations = await buildDestinationContext(preferences, 30);
   const prefSummary = buildPreferenceSummary(preferences);
   const systemPrompt = `Bạn là chuyên gia tư vấn du lịch Việt Nam. Nhiệm vụ: gợi ý địa điểm du lịch dựa trên sở thích người dùng.
 
@@ -119,7 +147,8 @@ Quy tắc:
 - matchScore 0-100 dựa trên mức độ phù hợp
 - reason bằng tiếng Việt, ngắn gọn, thuyết phục
 - Chỉ dùng địa điểm có trong danh sách, kèm id chính xác
-- Ưu tiên địa điểm có rating cao, isFeatured=true`;
+- Ưu tiên địa điểm có rating cao, isFeatured=true
+- QUAN TRỌNG: Nếu người dùng chọn vùng miền cụ thể, CHỈ trả về địa điểm thuộc đúng vùng miền đó. TUYỆT ĐỐI KHÔNG trả về địa điểm ở vùng miền khác.`;
   const userMessage = `Sở thích của tôi: ${prefSummary.join('; ') || 'Không có yêu cầu cụ thể, hãy gợi ý địa điểm tốt nhất'}. Hãy gợi ý cho tôi.`;
 
   const aiRes = await callDeepSeek([

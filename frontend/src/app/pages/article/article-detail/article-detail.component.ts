@@ -1,6 +1,7 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule, ActivatedRoute } from '@angular/router';
+import { Subscription } from 'rxjs';
 import { ApiService } from '../../../core/services/api.service';
 
 @Component({
@@ -10,18 +11,29 @@ import { ApiService } from '../../../core/services/api.service';
   templateUrl: './article-detail.component.html',
   styleUrls: ['./article-detail.component.css']
 })
-export class ArticleDetailComponent implements OnInit {
+export class ArticleDetailComponent implements OnInit, OnDestroy {
   article: any = null;
   currentImageIndex = 0;
+  private routeSub!: Subscription;
   
   constructor(private api: ApiService, private route: ActivatedRoute) {}
   
   ngOnInit() {
-    const slug = this.route.snapshot.paramMap.get('slug') || '';
-    this.api.getArticle(slug).subscribe(data => { 
-      this.article = data;
-      this.currentImageIndex = 0;
+    this.routeSub = this.route.paramMap.subscribe(params => {
+      const slug = params.get('slug') || '';
+      if (slug) {
+        this.article = null;
+        this.currentImageIndex = 0;
+        this.api.getArticle(slug).subscribe(data => { 
+          this.article = data;
+          this.currentImageIndex = 0;
+        });
+      }
     });
+  }
+
+  ngOnDestroy() {
+    this.routeSub?.unsubscribe();
   }
   
   getTags(): string[] { 

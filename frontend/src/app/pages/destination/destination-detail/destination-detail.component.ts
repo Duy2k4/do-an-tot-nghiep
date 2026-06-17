@@ -1,7 +1,8 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule, ActivatedRoute } from '@angular/router';
 import { FormsModule } from '@angular/forms';
+import { Subscription } from 'rxjs';
 import { ApiService } from '../../../core/services/api.service';
 import { AuthService } from '../../../core/services/auth.service';
 import { AuthModalService } from '../../../core/services/auth-modal.service';
@@ -14,7 +15,7 @@ import { ConfirmDialogService } from '../../../core/services/confirm-dialog.serv
   templateUrl: './destination-detail.component.html',
   styleUrls: ['./destination-detail.component.css']
 })
-export class DestinationDetailComponent implements OnInit {
+export class DestinationDetailComponent implements OnInit, OnDestroy {
   destination: any = null;
   relatedDestinations: any[] = [];
   reviews: any[] = [];
@@ -26,6 +27,7 @@ export class DestinationDetailComponent implements OnInit {
   isEditingReview = false;
   reviewSubmitted = false;
   reviewError = '';
+  private routeSub!: Subscription;
 
   constructor(
     private api: ApiService,
@@ -36,8 +38,31 @@ export class DestinationDetailComponent implements OnInit {
   ) {}
 
   ngOnInit() {
-    const slug = this.route.snapshot.paramMap.get('slug') || this.route.snapshot.paramMap.get('id');
-    this.loadDestination(slug!);
+    this.routeSub = this.route.paramMap.subscribe(params => {
+      const slug = params.get('slug') || params.get('id');
+      if (slug) {
+        this.resetState();
+        this.loadDestination(slug);
+      }
+    });
+  }
+
+  ngOnDestroy() {
+    this.routeSub?.unsubscribe();
+  }
+
+  resetState() {
+    this.destination = null;
+    this.relatedDestinations = [];
+    this.reviews = [];
+    this.isFavorite = false;
+    this.loadingError = false;
+    this.newReview = { rating: 0, comment: '' };
+    this.reviewSuccess = false;
+    this.userReview = null;
+    this.isEditingReview = false;
+    this.reviewSubmitted = false;
+    this.reviewError = '';
   }
 
   loadDestination(slug: string) {
@@ -65,10 +90,9 @@ export class DestinationDetailComponent implements OnInit {
     }
   }
 
-  get visibleReviews():any[]{
-    if(!this.userReview?.id) return this.reviews;
-    return this.reviews.filter((r:any) => r.id !==this.userReview.id);
-
+  get visibleReviews(): any[] {
+    if (!this.userReview?.id) return this.reviews;
+    return this.reviews.filter((r: any) => r.id !== this.userReview.id);
   }
 
   getHighlights(): string[] {
@@ -213,5 +237,4 @@ export class DestinationDetailComponent implements OnInit {
       }
     });
   }
-
 }

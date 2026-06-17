@@ -17,7 +17,7 @@ export class ArticleListComponent implements OnInit {
   loading = true;
   search = '';
   category = '';
-  pagination: any = { page: 1, limit: 9, total: 0, totalPages: 0 };
+  pagination: any = { page: 1, limit: 3, total: 0, totalPages: 0 };
   pageNumbers: number[] = [];
   
   constructor(private api: ApiService) {}
@@ -26,10 +26,10 @@ export class ArticleListComponent implements OnInit {
   
   loadCategories() { this.api.getArticleCategories().subscribe(data => { this.categories = data; }); }
   
-  loadArticles() {
+  loadArticles(page = this.pagination.page) {
     this.loading = true;
-    this.pagination.page = 1;
-    const params: any = { page: 1, limit: 9, category: this.category };
+    this.pagination.page = page;
+    const params: any = { page, limit: this.pagination.limit, category: this.category };
     if (this.search) params.search = this.search;
     this.api.getArticles(params).subscribe(res => {
       this.articles = res.data;
@@ -40,12 +40,22 @@ export class ArticleListComponent implements OnInit {
         }
       });
       this.pagination = res.pagination;
-      this.pageNumbers = Array.from({length: Math.min(5, res.pagination.totalPages)}, (_, i) => i + 1);
+      this.pageNumbers = this.getPageNumbers(res.pagination.page, res.pagination.totalPages);
       this.loading = false;
     }, () => { this.loading = false; });
   }
-  
-  goToPage(p: number) { this.pagination.page = p; this.loadArticles(); }
+
+  getPageNumbers(current: number, totalPages: number): number[] {
+    const visibleCount = Math.min(5, totalPages);
+    const start = Math.max(1, Math.min(current - 2, totalPages - visibleCount + 1));
+    return Array.from({ length: visibleCount }, (_, i) => start + i);
+  }
+
+  goToPage(page: number) {
+    if (page < 1 || page > this.pagination.totalPages || page === this.pagination.page) return;
+    this.loadArticles(page);
+    window.scrollTo({ top: 300, behavior: 'smooth' });
+  }
   
   // Các hàm xử lý slider ảnh
   getArticleImage(article: any): string {

@@ -9,23 +9,28 @@
     <div class="filters-bar">
       <div class="filter-search">
         <span class="material-icons">search</span>
-        <input type="text" [(ngModel)]="search" (ngModelChange)="loadTours()" placeholder="Tìm kiếm tour..." class="search-input">
+        <input type="text" [(ngModel)]="search" (ngModelChange)="loadTours(1)" placeholder="Tìm kiếm tour..."
+          class="search-input">
       </div>
       <div class="filter-chips">
         <div class="chip-group">
           <span class="material-icons chip-icon">sort</span>
-          <select class="chip-select" [(ngModel)]="sort" (change)="loadTours()">
+          <select class="chip-select" [(ngModel)]="sort" (change)="loadTours(1)">
             <option value="createdAt">Mới nhất</option>
             <option value="price">Giá: Thấp đến cao</option>
           </select>
         </div>
       </div>
     </div>
-    <div class="loading-spinner" *ngIf="loading"><div class="spinner"></div></div>
+    <div class="loading-spinner" *ngIf="loading">
+      <div class="spinner"></div>
+    </div>
     <div class="grid grid-3" *ngIf="!loading">
       <div *ngFor="let t of tours" class="card tour-card fade-in">
         <div class="card-image" style="height:200px;">
-          <img [src]="t.images?.[0]?.url ? api.mediaUrl(t.images[0].url) : (t.imageUrl ? api.mediaUrl(t.imageUrl) : 'https://picsum.photos/seed/' + t.slug + '/400/250')" [alt]="t.name">
+          <img
+            [src]="t.images?.[0]?.url ? api.mediaUrl(t.images[0].url) : (t.imageUrl ? api.mediaUrl(t.imageUrl) : 'https://picsum.photos/seed/' + t.slug + '/400/250')"
+            [alt]="t.name">
           <div class="card-img-overlay">
             <span class="overlay-text"><span class="material-icons">explore</span> Xem chi tiết</span>
           </div>
@@ -59,7 +64,14 @@
       <h3>Không tìm thấy tour nào</h3>
     </div>
     <div class="pagination" *ngIf="!loading && pagination.totalPages > 1">
-      <button *ngFor="let p of pageNumbers" [class.active]="p === pagination.page" (click)="goToPage(p)">{{ p }}</button>
+      <button [disabled]="pagination.page <= 1" (click)="goToPage(pagination.page - 1)">
+        <span class="material-icons">chevron_left</span>
+      </button>
+      <button *ngFor="let p of pageNumbers" [class.active]="p === pagination.page" (click)="goToPage(p)">{{ p
+        }}</button>
+      <button [disabled]="pagination.page >= pagination.totalPages" (click)="goToPage(pagination.page + 1)">
+        <span class="material-icons">chevron_right</span>
+      </button>
     </div>
   </div>
 </section>

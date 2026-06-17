@@ -1,7 +1,8 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule, ActivatedRoute } from '@angular/router';
 import { FormsModule } from '@angular/forms';
+import { Subscription } from 'rxjs';
 import { ApiService } from '../../../core/services/api.service';
 import { AuthService } from '../../../core/services/auth.service';
 import { AuthModalService } from '../../../core/services/auth-modal.service';
@@ -13,7 +14,7 @@ import { AuthModalService } from '../../../core/services/auth-modal.service';
   templateUrl: './tour-detail.component.html',
   styleUrls: ['./tour-detail.component.css']
 })
-export class TourDetailComponent implements OnInit {
+export class TourDetailComponent implements OnInit, OnDestroy {
   tour: any = null;
   bookingForm: any = {
     startDate: '',
@@ -27,6 +28,7 @@ export class TourDetailComponent implements OnInit {
   bookingError = '';
   bookingSuccess = '';
   bookingFieldErrors: Record<string, string> = {};
+  private routeSub!: Subscription;
 
   constructor(
     public api: ApiService,
@@ -36,14 +38,23 @@ export class TourDetailComponent implements OnInit {
   ) {}
 
   ngOnInit() {
-    const slug = this.route.snapshot.paramMap.get('slug') || this.route.snapshot.paramMap.get('id') || '';
-    this.api.getTour(slug).subscribe(data => { this.tour = data; });
+    this.routeSub = this.route.paramMap.subscribe(params => {
+      const slug = params.get('slug') || params.get('id') || '';
+      if (slug) {
+        this.tour = null;
+        this.api.getTour(slug).subscribe(data => { this.tour = data; });
+      }
+    });
     const user = this.auth.user();
     if (user) {
       this.bookingForm.contactName = user.fullName || '';
       this.bookingForm.contactEmail = user.email || '';
       this.bookingForm.contactPhone = user.phone || '';
     }
+  }
+
+  ngOnDestroy() {
+    this.routeSub?.unsubscribe();
   }
 
   getIncludes(): string[] { try { return JSON.parse(this.tour?.includes || '[]'); } catch { return []; } }
